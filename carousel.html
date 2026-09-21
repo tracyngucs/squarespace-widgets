@@ -1,0 +1,1113 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Feast Carousel Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#f6f2ea;
+    --surface:#ffffff;
+    --surface-2:#efe7d8;
+    --border:#ddd0b4;
+    --ink:#241f16;
+    --ink-soft:#5c5240;
+    --muted:#8c8065;
+    --accent:#a8752f;
+    --accent-strong:#7f5920;
+    --accent-ink:#fffaf0;
+    --danger:#b3432b;
+    --danger-bg:#fbeae5;
+    --focus:#a8752f;
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#16130d;
+      --surface:#201a12;
+      --surface-2:#2a2216;
+      --border:#3c3220;
+      --ink:#f3ebd9;
+      --ink-soft:#cdbfa0;
+      --muted:#988b6c;
+      --accent:#d8a24e;
+      --accent-strong:#eab766;
+      --accent-ink:#1a1409;
+      --danger:#e2836a;
+      --danger-bg:#3a2018;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#16130d;
+    --surface:#201a12;
+    --surface-2:#2a2216;
+    --border:#3c3220;
+    --ink:#f3ebd9;
+    --ink-soft:#cdbfa0;
+    --muted:#988b6c;
+    --accent:#d8a24e;
+    --accent-strong:#eab766;
+    --accent-ink:#1a1409;
+    --danger:#e2836a;
+    --danger-bg:#3a2018;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Inter",system-ui,-apple-system,sans-serif;
+    padding:28px 16px 60px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+  header.page-head{margin-bottom:22px;}
+  h1{
+    font-family:"Fraunces",Georgia,serif;
+    font-weight:600;
+    font-size:clamp(24px,3vw,32px);
+    letter-spacing:-0.01em;
+    text-wrap:balance;
+    margin:0 0 6px;
+  }
+  .page-head p{margin:0;color:var(--ink-soft);font-size:14.5px;max-width:62ch;}
+
+  .layout{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(300px,420px);
+    gap:22px;
+    align-items:start;
+  }
+  @media (max-width:880px){
+    .layout{grid-template-columns:1fr;}
+  }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px;
+  }
+
+  .panel-top-actions{
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:12px;
+  }
+  .ghost-link-btn{
+    background:transparent;
+    border:none;
+    color:var(--accent-strong);
+    font-family:inherit;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    padding:2px 0;
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .ghost-link-btn:hover{color:var(--accent);}
+
+  #errorBanner{
+    display:none;
+    background:var(--danger-bg);
+    border:1px solid var(--danger);
+    color:var(--danger);
+    border-radius:var(--radius);
+    padding:11px 14px;
+    font-size:13.5px;
+    margin-bottom:16px;
+  }
+  #errorBanner.show{display:block;}
+
+  .slide-card{
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px;
+    margin-bottom:16px;
+    background:var(--surface-2);
+  }
+  .slide-card-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .slide-card-actions{display:flex;gap:6px;}
+  .slide-badge{
+    font-family:"Fraunces",serif;
+    font-weight:600;
+    font-size:15px;
+    color:var(--accent-strong);
+  }
+  .icon-btn{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--muted);
+    width:28px;height:28px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:13px;
+    line-height:1;
+  }
+  .icon-btn:hover{border-color:var(--danger);color:var(--danger);}
+
+  .field{margin-bottom:14px;}
+  .field:last-child{margin-bottom:0;}
+  .field-label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    margin-bottom:6px;
+  }
+  .field-hint{
+    margin:5px 0 0;
+    font-size:12px;
+    color:var(--muted);
+  }
+  input[type="url"],
+  input[type="text"],
+  textarea{
+    width:100%;
+    font-family:inherit;
+    font-size:14px;
+    color:var(--ink);
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:9px 11px;
+    resize:vertical;
+  }
+  input[type="url"]:focus,
+  input[type="text"]:focus,
+  textarea:focus{
+    outline:2px solid var(--focus);
+    outline-offset:1px;
+  }
+  input.field-error, textarea.field-error{
+    border-color:var(--danger);
+  }
+  .caption-editor{
+    width:100%;
+    min-height:96px;
+    font-family:inherit;
+    font-size:14px;
+    line-height:1.5;
+    color:var(--ink);
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:9px 11px;
+  }
+  .caption-editor:focus{
+    outline:2px solid var(--focus);
+    outline-offset:1px;
+  }
+  .caption-editor.field-error{border-color:var(--danger);}
+  .caption-editor:empty:before{
+    content:attr(data-placeholder);
+    color:var(--muted);
+  }
+  .caption-editor p, .caption-editor div{margin:0 0 10px;}
+  .caption-editor p:last-child, .caption-editor div:last-child{margin-bottom:0;}
+  input[type="file"]{
+    width:100%;
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+
+  .segmented{
+    display:inline-flex;
+    border:1px solid var(--border);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  .seg-btn{
+    background:var(--surface);
+    border:none;
+    color:var(--ink-soft);
+    font-family:inherit;
+    font-size:13px;
+    font-weight:500;
+    padding:7px 16px;
+    cursor:pointer;
+  }
+  .seg-btn + .seg-btn{border-left:1px solid var(--border);}
+  .seg-btn.active{background:var(--accent);color:var(--accent-ink);}
+
+  .mini-toolbar{display:flex;gap:6px;margin-bottom:7px;}
+  .mini-btn{
+    background:var(--surface);
+    border:1px solid var(--border);
+    color:var(--ink-soft);
+    width:28px;height:26px;
+    border-radius:6px;
+    font-size:12.5px;
+    cursor:pointer;
+  }
+  .mini-btn:hover{border-color:var(--accent);color:var(--accent-strong);}
+
+  .radio-row{display:flex;gap:16px;flex-wrap:wrap;}
+  .radio-opt{
+    display:flex;align-items:center;gap:6px;
+    font-size:13.5px;color:var(--ink-soft);cursor:pointer;
+  }
+
+  .thumb-custom{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);}
+  .thumb-custom[hidden]{display:none;}
+
+  #addSlideBtn{
+    width:100%;
+    background:transparent;
+    border:1.5px dashed var(--border);
+    color:var(--ink-soft);
+    border-radius:10px;
+    padding:11px;
+    font-family:inherit;
+    font-size:13.5px;
+    font-weight:500;
+    cursor:pointer;
+  }
+  #addSlideBtn:hover{border-color:var(--accent);color:var(--accent-strong);}
+  #addSlideBtn[hidden]{display:none;}
+
+  .primary-btn{
+    background:var(--accent);
+    color:var(--accent-ink);
+    border:none;
+    border-radius:9px;
+    padding:12px 18px;
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:600;
+    cursor:pointer;
+    width:100%;
+    margin-top:18px;
+  }
+  .primary-btn:hover{background:var(--accent-strong);}
+
+  /* preview panel */
+  .preview-panel{position:sticky;top:16px;}
+  .preview-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+  }
+  .preview-head h2{
+    font-family:"Fraunces",serif;
+    font-size:16px;
+    font-weight:600;
+    margin:0;
+  }
+  .width-toggle{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .width-toggle button{
+    background:var(--surface);
+    border:none;
+    color:var(--ink-soft);
+    font-size:12px;
+    padding:5px 10px;
+    cursor:pointer;
+  }
+  .width-toggle button + button{border-left:1px solid var(--border);}
+  .width-toggle button.active{background:var(--accent);color:var(--accent-ink);}
+
+  .preview-frame-outer{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:14px;
+    display:flex;
+    justify-content:center;
+  }
+  #previewIframe{
+    width:100%;
+    max-width:100%;
+    height:520px;
+    border:none;
+    background:#fff;
+    border-radius:6px;
+    transition:max-width .2s ease;
+  }
+  .preview-frame-outer.mobile #previewIframe{max-width:360px;height:640px;}
+
+  /* modal */
+  .modal-overlay{
+    position:fixed;inset:0;
+    background:rgba(20,16,8,.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:100;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    max-width:720px;
+    width:100%;
+    max-height:85vh;
+    display:flex;
+    flex-direction:column;
+    padding:20px;
+  }
+  .modal-box h2{
+    font-family:"Fraunces",serif;
+    font-size:18px;
+    margin:0 0 4px;
+  }
+  .modal-box p{margin:0 0 14px;color:var(--ink-soft);font-size:13.5px;}
+  #codeOutput{
+    flex:1;
+    min-height:260px;
+    font-family:ui-monospace,Menlo,Consolas,monospace;
+    font-size:12px;
+    line-height:1.5;
+    background:var(--bg);
+    color:var(--ink);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:12px;
+    resize:vertical;
+  }
+  #importInput{
+    flex:1;
+    min-height:200px;
+    font-family:ui-monospace,Menlo,Consolas,monospace;
+    font-size:12px;
+    line-height:1.5;
+    background:var(--bg);
+    color:var(--ink);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:12px;
+    resize:vertical;
+  }
+  .import-error{
+    margin-top:10px;
+    background:var(--danger-bg);
+    border:1px solid var(--danger);
+    color:var(--danger);
+    border-radius:8px;
+    padding:9px 12px;
+    font-size:13px;
+  }
+  .import-error[hidden]{display:none;}
+  .modal-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+  .modal-actions button{
+    font-family:inherit;
+    font-size:13.5px;
+    font-weight:600;
+    border-radius:8px;
+    padding:9px 16px;
+    cursor:pointer;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--ink);
+  }
+  .modal-actions .primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
+  .modal-actions .primary:hover{background:var(--accent-strong);}
+  .modal-actions .ghost:hover{border-color:var(--accent);}
+  #closeModalBtn{margin-left:auto;}
+
+  .toast{
+    position:fixed;
+    bottom:22px;left:50%;
+    transform:translateX(-50%) translateY(8px);
+    background:var(--ink);
+    color:var(--bg);
+    padding:9px 16px;
+    border-radius:8px;
+    font-size:13px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .18s ease, transform .18s ease;
+    z-index:200;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <h1>Feast Carousel Builder</h1>
+    <p>Add up to three video or image slides with captions, preview exactly how the carousel will look, then copy the finished embed code into a Squarespace code block.</p>
+  </header>
+
+  <div class="layout">
+    <div class="panel">
+      <div class="panel-top-actions">
+        <button type="button" class="ghost-link-btn" id="openImportBtn">Load from existing embed code&hellip;</button>
+      </div>
+      <div id="errorBanner"></div>
+      <div id="slidesContainer"></div>
+      <button type="button" id="addSlideBtn">+ Add another slide</button>
+      <button type="button" class="primary-btn" id="getCodeBtn">Get embed code</button>
+    </div>
+
+    <div class="panel preview-panel">
+      <div class="preview-head">
+        <h2>Live preview</h2>
+        <div class="width-toggle">
+          <button type="button" data-width="desktop" class="active">Desktop</button>
+          <button type="button" data-width="mobile">Mobile</button>
+        </div>
+      </div>
+      <div class="preview-frame-outer" id="previewOuter">
+        <iframe id="previewIframe" title="Carousel preview"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <h2>Embed code</h2>
+    <p>Paste this into a Squarespace code block wherever you want the carousel to appear.</p>
+    <textarea id="codeOutput" readonly></textarea>
+    <div class="modal-actions">
+      <button type="button" class="primary" id="copyCodeBtn">Copy code</button>
+      <button type="button" class="ghost" id="closeModalBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="importModalOverlay">
+  <div class="modal-box">
+    <h2>Load from existing embed code</h2>
+    <p>Paste the embed code you last put into Squarespace, and it'll rebuild the slides below &mdash; media links, captions and thumbnails included.</p>
+    <textarea id="importInput" placeholder="Paste the full embed code here&hellip;"></textarea>
+    <div id="importError" class="import-error" hidden></div>
+    <div class="modal-actions">
+      <button type="button" class="primary" id="loadImportBtn">Load slides</button>
+      <button type="button" class="ghost" id="closeImportModalBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var FEAST_CAPTION = "<strong>The Feasts of the Lord are here!</strong><br><br>Join us as we discover more of the revelation of Jesus Christ through the Feasts of the Lord and commemorate these appointed times with thanksgiving and worship.<br><br>As we celebrate, we remember and proclaim the victory Jesus Christ has already won for us through the Cross!";
+
+  function newSlide(overrides){
+    return Object.assign({
+      type:"video",
+      url:"",
+      localPreviewUrl:null,
+      caption:"",
+      thumbMode:"auto",
+      thumbUrl:"",
+      thumbLocalPreviewUrl:null
+    }, overrides || {});
+  }
+
+  // Remembers your last edits in this browser, on this device, so refreshing
+  // the page (or coming back later) picks up where you left off. Only the
+  // durable fields are saved — never the local-preview file previews,
+  // which can't survive a reload anyway. On a different device, use "Load
+  // from existing embed code" instead.
+  var STORAGE_KEY = "feastCarouselBuilder.slides.v1";
+
+  function persistSlides(){
+    try {
+      var toSave = slides.map(function(s){
+        return { type: s.type, url: s.url, caption: s.caption, thumbMode: s.thumbMode, thumbUrl: s.thumbUrl };
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+    } catch(err){ /* storage unavailable — not fatal, just skip remembering */ }
+  }
+
+  function loadInitialSlides(){
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        var saved = JSON.parse(raw);
+        if(Array.isArray(saved) && saved.length > 0){
+          restoredFromStorage = true;
+          return saved.slice(0, 3).map(function(s){ return newSlide(s); });
+        }
+      }
+    } catch(err){ /* fall through to the default example below */ }
+    return [
+      newSlide({ url:"https://www.kogsc.org/s/WhatsApp-Video-2026-09-12-at-012440-twcr.mp4", caption: FEAST_CAPTION }),
+      newSlide({ url:"https://www.kogsc.org/s/WhatsApp-Video-2026-09-12-at-015515.mp4", caption: FEAST_CAPTION })
+    ];
+  }
+
+  var restoredFromStorage = false;
+  var slides = loadInitialSlides();
+
+  var container = document.getElementById("slidesContainer");
+  var addBtn = document.getElementById("addSlideBtn");
+  var errorBanner = document.getElementById("errorBanner");
+  var iframe = document.getElementById("previewIframe");
+
+  function cardTemplate(i){
+    return (
+      '<div class="slide-card" id="card-' + i + '" data-idx="' + i + '">' +
+        '<div class="slide-card-head">' +
+          '<span class="slide-badge">Slide ' + (i+1) + '</span>' +
+          '<div class="slide-card-actions">' +
+            (i > 0 ? '<button type="button" class="icon-btn" data-action="moveUp" data-idx="' + i + '" aria-label="Move slide ' + (i+1) + ' up" title="Move up">↑</button>' : '') +
+            (i < slides.length - 1 ? '<button type="button" class="icon-btn" data-action="moveDown" data-idx="' + i + '" aria-label="Move slide ' + (i+1) + ' down" title="Move down">↓</button>' : '') +
+            (i > 0 ? '<button type="button" class="icon-btn" data-action="remove" data-idx="' + i + '" aria-label="Remove slide ' + (i+1) + '">✕</button>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="field">' +
+          '<span class="field-label">Media type</span>' +
+          '<div class="segmented">' +
+            '<button type="button" class="seg-btn" data-action="type" data-idx="' + i + '" data-value="video">Video</button>' +
+            '<button type="button" class="seg-btn" data-action="type" data-idx="' + i + '" data-value="image">Image</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="field">' +
+          '<label class="field-label" for="url-' + i + '">Hosted media URL</label>' +
+          '<input type="url" id="url-' + i + '" data-role="url" data-idx="' + i + '" placeholder="https://www.yoursite.com/s/your-file.mp4">' +
+          '<p class="field-hint">Upload the file to your site first, then paste its link here — this is what goes live.</p>' +
+        '</div>' +
+        '<div class="field">' +
+          '<label class="field-label" for="localfile-' + i + '">Preview with a local file (optional)</label>' +
+          '<input type="file" id="localfile-' + i + '" data-role="localPreview" data-idx="' + i + '">' +
+          '<p class="field-hint">Only shown in the preview on this page — it is not included in the final code.</p>' +
+        '</div>' +
+        '<div class="field">' +
+          '<label class="field-label">Caption</label>' +
+          '<div class="mini-toolbar">' +
+            '<button type="button" class="mini-btn" data-action="bold" data-idx="' + i + '" title="Bold"><b>B</b></button>' +
+            '<button type="button" class="mini-btn" data-action="italic" data-idx="' + i + '" title="Italic"><i>I</i></button>' +
+          '</div>' +
+          '<div class="caption-editor" id="caption-' + i + '" data-role="caption" data-idx="' + i + '" contenteditable="true" data-placeholder="Paste or type the caption text… select text and use B / I to format, press Enter for a new paragraph."></div>' +
+        '</div>' +
+        '<div class="field" data-role="thumbField">' +
+          '<label class="field-label">Thumbnail</label>' +
+          '<div data-role="videoThumbChoice">' +
+            '<div class="radio-row">' +
+              '<label class="radio-opt"><input type="radio" name="thumb-' + i + '" data-role="thumbMode" data-idx="' + i + '" value="auto"> Use the video frame</label>' +
+              '<label class="radio-opt"><input type="radio" name="thumb-' + i + '" data-role="thumbMode" data-idx="' + i + '" value="custom"> Custom image</label>' +
+            '</div>' +
+            '<div class="thumb-custom" data-role="thumbCustomFields" hidden>' +
+              '<input type="url" id="thumburl-' + i + '" data-role="thumbUrl" data-idx="' + i + '" placeholder="https://www.yoursite.com/s/thumbnail.jpg" style="margin-bottom:8px;">' +
+              '<input type="file" id="thumblocal-' + i + '" data-role="thumbLocalPreview" data-idx="' + i + '" accept="image/*">' +
+              '<p class="field-hint">Preview upload only — paste the hosted image link above for the final code.</p>' +
+            '</div>' +
+          '</div>' +
+          '<p class="field-hint" data-role="imageThumbNote" hidden>This image is used as its own thumbnail automatically.</p>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function applySlideToCard(i){
+    var s = slides[i];
+    var card = document.getElementById("card-" + i);
+    if(!card) return;
+
+    card.querySelectorAll('[data-action="type"]').forEach(function(btn){
+      btn.classList.toggle("active", btn.dataset.value === s.type);
+    });
+
+    var urlInput = document.getElementById("url-" + i);
+    if(document.activeElement !== urlInput) urlInput.value = s.url;
+
+    var captionInput = document.getElementById("caption-" + i);
+    if(document.activeElement !== captionInput) captionInput.innerHTML = s.caption;
+
+    var videoChoice = card.querySelector('[data-role="videoThumbChoice"]');
+    var imageNote = card.querySelector('[data-role="imageThumbNote"]');
+    if(s.type === "video"){
+      videoChoice.hidden = false;
+      imageNote.hidden = true;
+      card.querySelectorAll('[data-role="thumbMode"]').forEach(function(radio){
+        radio.checked = (radio.value === s.thumbMode);
+      });
+      card.querySelector('[data-role="thumbCustomFields"]').hidden = (s.thumbMode !== "custom");
+      var thumbUrlInput = document.getElementById("thumburl-" + i);
+      if(document.activeElement !== thumbUrlInput) thumbUrlInput.value = s.thumbUrl;
+    } else {
+      videoChoice.hidden = true;
+      imageNote.hidden = false;
+    }
+
+    var localFileInput = document.getElementById("localfile-" + i);
+    localFileInput.setAttribute("accept", s.type === "video" ? "video/*" : "image/*");
+  }
+
+  function renderAllCards(){
+    container.innerHTML = slides.map(function(_, i){ return cardTemplate(i); }).join("");
+    slides.forEach(function(_, i){ applySlideToCard(i); });
+    addBtn.hidden = slides.length >= 3;
+  }
+
+  function renderCard(i){
+    var card = document.getElementById("card-" + i);
+    var temp = document.createElement("div");
+    temp.innerHTML = cardTemplate(i);
+    card.replaceWith(temp.firstElementChild);
+    applySlideToCard(i);
+  }
+
+  // ---- caption rich text (paste-as-text + bold/italic on selection) ----
+  function applyCaptionFormat(idx, command){
+    var el = document.getElementById("caption-" + idx);
+    el.focus();
+    document.execCommand(command);
+    slides[idx].caption = el.innerHTML;
+    schedulePreview();
+  }
+
+  // ---- event delegation ----
+  var debounceTimer = null;
+  function schedulePreview(){
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(updatePreview, 150);
+  }
+
+  container.addEventListener("input", function(e){
+    var captionEl = e.target.closest ? e.target.closest('[data-role="caption"]') : null;
+    if(captionEl){ slides[+captionEl.dataset.idx].caption = captionEl.innerHTML; schedulePreview(); return; }
+    var role = e.target.dataset.role, idx = +e.target.dataset.idx;
+    if(role === "url"){ slides[idx].url = e.target.value; schedulePreview(); }
+    else if(role === "thumbUrl"){ slides[idx].thumbUrl = e.target.value; schedulePreview(); }
+  });
+
+  // Paste as plain text, but translate WhatsApp's own *bold* / _italic_ /
+  // ~strikethrough~ markers into real formatting instead of leaving the
+  // literal symbols in the caption (and instead of trusting whatever HTML
+  // WhatsApp's clipboard payload carries, which is often malformed).
+  function escapeHtml(str){
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function whatsAppTextToHtml(text){
+    var html = escapeHtml(text);
+    // Each pattern only wraps the text strictly between a matched pair of
+    // markers, so formatting can never bleed past its own closing marker.
+    html = html.replace(/\*([^\n*]+)\*/g, "<strong>$1</strong>");
+    html = html.replace(/_([^\n_]+)_/g, "<em>$1</em>");
+    html = html.replace(/~([^\n~]+)~/g, "<s>$1</s>");
+    return html.split(/\n{2,}/).map(function(para){
+      return "<p>" + para.split("\n").join("<br>") + "</p>";
+    }).join("");
+  }
+
+  container.addEventListener("paste", function(e){
+    // Once a caption has nested elements (from a previous paste), clearing
+    // it can leave an empty wrapper behind, and the caret — and so the
+    // paste event's target — can end up on that nested element rather
+    // than the caption div itself. Look upward for it instead of requiring
+    // an exact match, so this still fires correctly either way.
+    var captionEl = e.target.closest ? e.target.closest('[data-role="caption"]') : null;
+    if(!captionEl) return;
+    e.preventDefault();
+    var text = (e.clipboardData || window.clipboardData).getData("text/plain");
+    document.execCommand("insertHTML", false, whatsAppTextToHtml(text));
+    slides[+captionEl.dataset.idx].caption = captionEl.innerHTML;
+    schedulePreview();
+  });
+
+  // Keep the caption's text selection alive when a toolbar button is pressed.
+  container.addEventListener("mousedown", function(e){
+    if(e.target.closest('[data-action="bold"], [data-action="italic"]')) e.preventDefault();
+  });
+
+  container.addEventListener("focusin", function(e){
+    if(e.target.closest && e.target.closest('[data-role="caption"]')){
+      try { document.execCommand("defaultParagraphSeparator", false, "p"); } catch(err){}
+    }
+  });
+
+  container.addEventListener("change", function(e){
+    var role = e.target.dataset.role, idx = e.target.dataset.idx !== undefined ? +e.target.dataset.idx : null;
+    if(role === "localPreview"){
+      var file = e.target.files[0];
+      slides[idx].localPreviewUrl = file ? URL.createObjectURL(file) : null;
+      updatePreview();
+    } else if(role === "thumbLocalPreview"){
+      var tfile = e.target.files[0];
+      slides[idx].thumbLocalPreviewUrl = tfile ? URL.createObjectURL(tfile) : null;
+      updatePreview();
+    } else if(role === "thumbMode"){
+      slides[idx].thumbMode = e.target.value;
+      var card = document.getElementById("card-" + idx);
+      card.querySelector('[data-role="thumbCustomFields"]').hidden = (e.target.value !== "custom");
+      updatePreview();
+    }
+  });
+
+  container.addEventListener("click", function(e){
+    var btn = e.target.closest("[data-action]");
+    if(!btn) return;
+    var action = btn.dataset.action, idx = +btn.dataset.idx;
+    if(action === "type"){
+      var newType = btn.dataset.value;
+      if(slides[idx].type !== newType){
+        slides[idx].type = newType;
+        slides[idx].thumbMode = "auto";
+        renderCard(idx);
+        updatePreview();
+      }
+    } else if(action === "remove"){
+      slides.splice(idx, 1);
+      renderAllCards();
+      updatePreview();
+    } else if(action === "moveUp"){
+      if(idx > 0){
+        var tmpUp = slides[idx - 1];
+        slides[idx - 1] = slides[idx];
+        slides[idx] = tmpUp;
+        renderAllCards();
+        updatePreview();
+      }
+    } else if(action === "moveDown"){
+      if(idx < slides.length - 1){
+        var tmpDown = slides[idx + 1];
+        slides[idx + 1] = slides[idx];
+        slides[idx] = tmpDown;
+        renderAllCards();
+        updatePreview();
+      }
+    } else if(action === "bold"){
+      applyCaptionFormat(idx, "bold");
+    } else if(action === "italic"){
+      applyCaptionFormat(idx, "italic");
+    }
+  });
+
+  addBtn.addEventListener("click", function(){
+    if(slides.length >= 3) return;
+    slides.push(newSlide());
+    renderAllCards();
+    updatePreview();
+  });
+
+  // ---- width toggle ----
+  document.querySelectorAll(".width-toggle button").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll(".width-toggle button").forEach(function(b){ b.classList.remove("active"); });
+      btn.classList.add("active");
+      document.getElementById("previewOuter").classList.toggle("mobile", btn.dataset.width === "mobile");
+    });
+  });
+
+  // ---- building the embeddable fragment ----
+  function esc(str){
+    return String(str || "").replace(/"/g, "&quot;");
+  }
+
+  function toRuntimeSlide(s, forPreview){
+    var src = (forPreview && s.localPreviewUrl) ? s.localPreviewUrl : (s.url || "");
+    var thumbAsImage, thumbSrc = "";
+    if(s.type === "image"){
+      thumbAsImage = true;
+      thumbSrc = src;
+    } else if(s.thumbMode === "custom"){
+      thumbAsImage = true;
+      thumbSrc = (forPreview && s.thumbLocalPreviewUrl) ? s.thumbLocalPreviewUrl : (s.thumbUrl || "");
+    } else {
+      thumbAsImage = false;
+    }
+    return { type: s.type, src: src, text: s.caption || "", thumbAsImage: thumbAsImage, thumbSrc: thumbSrc };
+  }
+
+  function buildFragment(runtimeSlides){
+    var thumbsHtml = runtimeSlides.map(function(s, i){
+      var activeCls = i === 0 ? " active" : "";
+      if(s.thumbAsImage){
+        return '<img class="video-thumb' + activeCls + '" src="' + esc(s.thumbSrc) + '" alt="" onclick="changeVideo(' + i + ')">';
+      }
+      return '<video class="video-thumb' + activeCls + '" muted playsinline preload="metadata" onclick="changeVideo(' + i + ')"><source src="' + esc(s.src) + '" type="video/mp4"></video>';
+    }).join("\n    ");
+
+    var slidesJson = JSON.stringify(runtimeSlides.map(function(s){
+      // A video's poster is whatever image its thumbnail actually shows —
+      // the custom upload when one is set, so the main player and the
+      // thumbnail always agree before playback starts.
+      var poster = (s.type === "video" && s.thumbAsImage) ? s.thumbSrc : "";
+      return { type: s.type, src: s.src, text: s.text, poster: poster };
+    }));
+
+    return (
+'<div class="custom-carousel">\n' +
+'  <div class="carousel-main">\n' +
+'    <button class="carousel-arrow arrow-left" onclick="changeVideoByIndex(currentVideoIndex - 1)">&#10094;</button>\n' +
+'    <button id="playButton" class="play-button" type="button" aria-label="Play">\n' +
+'      <svg viewBox="0 0 24 24" width="36" height="36"><path d="M8 5v14l11-7z" fill="white"/></svg>\n' +
+'    </button>\n' +
+'    <div id="mainMediaWrap" class="main-media-wrap"></div>\n' +
+'    <button class="carousel-arrow arrow-right" onclick="changeVideoByIndex(currentVideoIndex + 1)">&#10095;</button>\n' +
+'  </div>\n' +
+'  <div class="carousel-thumbs">\n' +
+'    ' + thumbsHtml + '\n' +
+'  </div>\n' +
+'  <div id="videoText" class="video-text"></div>\n' +
+'</div>\n' +
+'<style>\n' +
+'.custom-carousel { max-width: 1280px; margin: auto; padding: 0 12px; }\n' +
+'.carousel-main { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; overflow: hidden; }\n' +
+'.carousel-main video, .carousel-main img { width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 1; }\n' +
+'.main-media-wrap { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }\n' +
+'.media-placeholder { color: #999; font-size: 14px; text-align: center; padding: 20px; border: 1px dashed #444; border-radius: 8px; }\n' +
+'.play-button { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; border-radius: 50%; border: none; background: rgba(0,0,0,0.6); cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; padding: 0; -webkit-appearance: none; appearance: none; pointer-events: auto !important; touch-action: manipulation; }\n' +
+'.play-button.hidden { display: none; }\n' +
+'.carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 5; background: rgba(0,0,0,0.45); color: #fff; border: none; width: 48px; height: 48px; cursor: pointer; font-size: 28px; }\n' +
+'.arrow-left { left: 12px; }\n' +
+'.arrow-right { right: 12px; }\n' +
+'.carousel-thumbs { display: flex; gap: 12px; margin-top: 12px; justify-content: center; flex-wrap: wrap; }\n' +
+'.video-thumb { width: 160px; height: 90px; object-fit: cover; cursor: pointer; opacity: 0.6; border: 2px solid transparent; }\n' +
+'.video-thumb.active { border: 2px solid #000; opacity: 1; }\n' +
+'.video-text { margin-top: 18px; text-align: center; font-size: 16px; line-height: 1.6; max-width: 900px; margin-left: auto; margin-right: auto; }\n' +
+'.video-text a, .video-text a:visited { color: #0000EE !important; text-decoration: underline !important; }\n' +
+'.video-text a:hover { color: #0000CC !important; }\n' +
+'.video-text em { font-style: italic; }\n' +
+'.video-text strong { font-weight: 700; }\n' +
+'.video-text p, .video-text div { margin: 0 0 14px; }\n' +
+'.video-text p:last-child, .video-text div:last-child { margin-bottom: 0; }\n' +
+'@media (max-width: 768px) {\n' +
+'  .carousel-arrow { width: 40px; height: 40px; font-size: 20px; }\n' +
+'  .arrow-left { left: 8px; }\n' +
+'  .arrow-right { right: 8px; }\n' +
+'  .play-button { display: none; }\n' +
+'  .carousel-thumbs { gap: 10px; margin-top: 10px; }\n' +
+'  .video-thumb { width: 120px; height: 67px; }\n' +
+'  .video-text { font-size: 14px; line-height: 1.5; margin-top: 14px; }\n' +
+'}\n' +
+'@media (max-width: 480px) {\n' +
+'  .custom-carousel { padding: 0 8px; }\n' +
+'  .carousel-arrow { width: 36px; height: 36px; font-size: 18px; }\n' +
+'  .arrow-left { left: 4px; }\n' +
+'  .arrow-right { right: 4px; }\n' +
+'  .play-button { display: none; }\n' +
+'  .carousel-thumbs { gap: 8px; margin-top: 8px; }\n' +
+'  .video-thumb { width: 100px; height: 56px; }\n' +
+'  .video-text { font-size: 13px; line-height: 1.4; margin-top: 12px; }\n' +
+'}\n' +
+'</style>\n' +
+'<script>\n' +
+'(function(){\n' +
+'  var slides = ' + slidesJson + ';\n' +
+'  window.currentVideoIndex = 0;\n' +
+'  function renderMain(){\n' +
+'    var wrap = document.getElementById("mainMediaWrap");\n' +
+'    var s = slides[window.currentVideoIndex];\n' +
+'    var btn = document.getElementById("playButton");\n' +
+'    if(!s || !s.src){\n' +
+'      wrap.innerHTML = \'<div class="media-placeholder">Add a media URL for this slide<\\/div>\';\n' +
+'      btn.style.display = "none";\n' +
+'    } else if(s.type === "video"){\n' +
+'      var posterAttr = s.poster ? (\' poster="\' + s.poster + \'"\') : "";\n' +
+'      wrap.innerHTML = \'<video id="mainVideo"\' + posterAttr + \' controls playsinline loop preload="metadata" controlsList="nodownload noplaybackrate" disablePictureInPicture><source src="\' + s.src + \'" type="video/mp4"><\\/video>\';\n' +
+'      btn.style.display = "";\n' +
+'      bindVideoEvents();\n' +
+'    } else {\n' +
+'      wrap.innerHTML = \'<img src="\' + s.src + \'" alt="">\';\n' +
+'      btn.style.display = "none";\n' +
+'    }\n' +
+'    document.getElementById("videoText").innerHTML = s ? s.text : "";\n' +
+'    document.querySelectorAll(".video-thumb").forEach(function(t, i){ t.classList.toggle("active", i === window.currentVideoIndex); });\n' +
+'  }\n' +
+'  function updatePlayIcon(){\n' +
+'    var video = document.getElementById("mainVideo");\n' +
+'    var btn = document.getElementById("playButton");\n' +
+'    if(!video || !btn) return;\n' +
+'    btn.classList.toggle("hidden", !video.paused);\n' +
+'  }\n' +
+'  function bindVideoEvents(){\n' +
+'    var video = document.getElementById("mainVideo");\n' +
+'    var btn = document.getElementById("playButton");\n' +
+'    if(!video) return;\n' +
+'    updatePlayIcon();\n' +
+'    btn.onclick = function(e){\n' +
+'      e.preventDefault(); e.stopPropagation();\n' +
+'      if(video.paused){ video.play().catch(function(){}); } else { video.pause(); }\n' +
+'    };\n' +
+'    video.addEventListener("play", updatePlayIcon);\n' +
+'    video.addEventListener("pause", updatePlayIcon);\n' +
+'    if(!video.hasAttribute("poster")){\n' +
+'      video.addEventListener("loadedmetadata", function(){ if(video.paused) video.currentTime = 0.1; });\n' +
+'    }\n' +
+'  }\n' +
+'  window.changeVideoByIndex = function(i){\n' +
+'    window.currentVideoIndex = (i + slides.length) % slides.length;\n' +
+'    renderMain();\n' +
+'  };\n' +
+'  window.changeVideo = function(i){ window.changeVideoByIndex(i); };\n' +
+'  function initThumbs(){\n' +
+'    document.querySelectorAll(".video-thumb").forEach(function(thumb){\n' +
+'      if(thumb.tagName === "VIDEO"){\n' +
+'        thumb.addEventListener("loadedmetadata", function(){ thumb.currentTime = 0.1; });\n' +
+'      }\n' +
+'    });\n' +
+'  }\n' +
+'  function init(){ renderMain(); initThumbs(); }\n' +
+'  if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", init); } else { init(); }\n' +
+'})();\n' +
+'<\/script>'
+    );
+  }
+
+  function updatePreview(){
+    var runtimeSlides = slides.map(function(s){ return toRuntimeSlide(s, true); });
+    var fragment = buildFragment(runtimeSlides);
+    var doc = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+      '<style>html,body{margin:0;background:#fff;color:#222;font-family:system-ui,-apple-system,sans-serif;}</style></head><body>' + fragment + '</body></html>';
+    iframe.srcdoc = doc;
+    persistSlides();
+  }
+
+  // ---- export / validation ----
+  function showError(msg){
+    errorBanner.textContent = msg;
+    errorBanner.classList.add("show");
+  }
+  function clearErrors(){
+    errorBanner.classList.remove("show");
+    document.querySelectorAll(".field-error").forEach(function(el){ el.classList.remove("field-error"); });
+  }
+
+  document.getElementById("getCodeBtn").addEventListener("click", function(){
+    clearErrors();
+    var firstBad = null;
+    slides.forEach(function(s, i){
+      var urlInput = document.getElementById("url-" + i);
+      if(!s.url.trim()){
+        urlInput.classList.add("field-error");
+        if(!firstBad) firstBad = urlInput;
+      }
+      if(s.type === "video" && s.thumbMode === "custom" && !s.thumbUrl.trim()){
+        var thumbInput = document.getElementById("thumburl-" + i);
+        thumbInput.classList.add("field-error");
+        if(!firstBad) firstBad = thumbInput;
+      }
+    });
+    if(firstBad){
+      showError("Add the missing hosted link(s) below before generating the code — highlighted in red.");
+      firstBad.scrollIntoView({ behavior: "smooth", block: "center" });
+      firstBad.focus();
+      return;
+    }
+    var runtimeSlides = slides.map(function(s){ return toRuntimeSlide(s, false); });
+    var code = buildFragment(runtimeSlides);
+    document.getElementById("codeOutput").value = code;
+    document.getElementById("modalOverlay").classList.add("show");
+  });
+
+  document.getElementById("closeModalBtn").addEventListener("click", function(){
+    document.getElementById("modalOverlay").classList.remove("show");
+  });
+  document.getElementById("modalOverlay").addEventListener("click", function(e){
+    if(e.target.id === "modalOverlay") e.currentTarget.classList.remove("show");
+  });
+
+  // ---- import: rebuild slides from previously-exported embed code ----
+  function parseEmbedCode(code){
+    var doc = new DOMParser().parseFromString(code, "text/html");
+    var scriptEl = doc.querySelector("script");
+    var scriptText = scriptEl ? scriptEl.textContent : "";
+    var match = scriptText.match(/var\s+slides\s*=\s*(\[[\s\S]*?\]);/);
+    if(!match){
+      throw new Error("Couldn't find slide data in that code — make sure you pasted the full embed code, including the <script> part.");
+    }
+    var slidesJson;
+    try {
+      slidesJson = JSON.parse(match[1]);
+    } catch(err){
+      throw new Error("That code's slide data looks corrupted — try re-pasting the whole thing.");
+    }
+    if(!Array.isArray(slidesJson) || slidesJson.length === 0){
+      throw new Error("No slides found in that code.");
+    }
+
+    var thumbEls = doc.querySelectorAll(".carousel-thumbs > *");
+    var result = slidesJson.slice(0, 3).map(function(s, i){
+      var type = s.type === "image" ? "image" : "video";
+      var thumbMode = "auto", thumbUrl = "";
+      var thumbEl = thumbEls[i];
+      if(type === "video" && thumbEl && thumbEl.tagName === "IMG"){
+        thumbMode = "custom";
+        thumbUrl = thumbEl.getAttribute("src") || "";
+      }
+      return newSlide({
+        type: type,
+        url: s.src || "",
+        caption: s.text || "",
+        thumbMode: thumbMode,
+        thumbUrl: thumbUrl
+      });
+    });
+    return result;
+  }
+
+  var importOverlay = document.getElementById("importModalOverlay");
+  var importInput = document.getElementById("importInput");
+  var importError = document.getElementById("importError");
+
+  document.getElementById("openImportBtn").addEventListener("click", function(){
+    importInput.value = "";
+    importError.hidden = true;
+    importOverlay.classList.add("show");
+    importInput.focus();
+  });
+  document.getElementById("closeImportModalBtn").addEventListener("click", function(){
+    importOverlay.classList.remove("show");
+  });
+  importOverlay.addEventListener("click", function(e){
+    if(e.target.id === "importModalOverlay") importOverlay.classList.remove("show");
+  });
+
+  document.getElementById("loadImportBtn").addEventListener("click", function(){
+    importError.hidden = true;
+    var code = importInput.value.trim();
+    if(!code){
+      importError.textContent = "Paste the embed code first.";
+      importError.hidden = false;
+      return;
+    }
+    try {
+      var loaded = parseEmbedCode(code);
+      slides = loaded;
+      renderAllCards();
+      updatePreview();
+      importOverlay.classList.remove("show");
+      showToast("Loaded " + slides.length + " slide" + (slides.length === 1 ? "" : "s"));
+    } catch(err){
+      importError.textContent = err.message || "Couldn't read that code.";
+      importError.hidden = false;
+    }
+  });
+
+  function showToast(msg){
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 1600);
+  }
+
+  document.getElementById("copyCodeBtn").addEventListener("click", function(){
+    var ta = document.getElementById("codeOutput");
+    ta.select();
+    try {
+      navigator.clipboard.writeText(ta.value).then(function(){ showToast("Code copied"); }).catch(function(){
+        document.execCommand("copy");
+        showToast("Code copied");
+      });
+    } catch(e){
+      document.execCommand("copy");
+      showToast("Code copied");
+    }
+  });
+
+  // ---- init ----
+  renderAllCards();
+  updatePreview();
+  if(restoredFromStorage) showToast("Restored your last edits on this device");
+})();
+</script>
+
+</body></html>
