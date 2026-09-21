@@ -1,0 +1,712 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>YouTube Video Grid Builder</title>
+<style>:root{color-scheme:light;}html{scroll-padding-top:env(safe-area-inset-top,0px);}body{margin:0;padding:0;}img{max-width:100%}</style>
+</head><body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#f6f2ea;
+    --surface:#ffffff;
+    --surface-2:#efe7d8;
+    --border:#ddd0b4;
+    --ink:#241f16;
+    --ink-soft:#5c5240;
+    --muted:#8c8065;
+    --accent:#a8752f;
+    --accent-strong:#7f5920;
+    --accent-ink:#fffaf0;
+    --danger:#b3432b;
+    --danger-bg:#fbeae5;
+    --focus:#a8752f;
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#16130d; --surface:#201a12; --surface-2:#2a2216; --border:#3c3220;
+      --ink:#f3ebd9; --ink-soft:#cdbfa0; --muted:#988b6c;
+      --accent:#d8a24e; --accent-strong:#eab766; --accent-ink:#1a1409;
+      --danger:#e2836a; --danger-bg:#3a2018;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#16130d; --surface:#201a12; --surface-2:#2a2216; --border:#3c3220;
+    --ink:#f3ebd9; --ink-soft:#cdbfa0; --muted:#988b6c;
+    --accent:#d8a24e; --accent-strong:#eab766; --accent-ink:#1a1409;
+    --danger:#e2836a; --danger-bg:#3a2018;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Inter",system-ui,-apple-system,sans-serif;
+    padding:28px 16px 60px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+  header.page-head{margin-bottom:22px;}
+  h1{
+    font-family:"Fraunces",Georgia,serif;
+    font-weight:600;
+    font-size:clamp(24px,3vw,32px);
+    letter-spacing:-0.01em;
+    text-wrap:balance;
+    margin:0 0 6px;
+  }
+  .page-head p{margin:0;color:var(--ink-soft);font-size:14.5px;max-width:64ch;}
+
+  .layout{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(300px,420px);
+    gap:22px;
+    align-items:start;
+  }
+  @media (max-width:880px){ .layout{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px;
+  }
+
+  .panel-top-actions{display:flex;justify-content:flex-end;margin-bottom:12px;}
+  .ghost-link-btn{
+    background:transparent;border:none;color:var(--accent-strong);
+    font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+    padding:2px 0;text-decoration:underline;text-underline-offset:2px;
+  }
+  .ghost-link-btn:hover{color:var(--accent);}
+
+  #errorBanner{
+    display:none;background:var(--danger-bg);border:1px solid var(--danger);
+    color:var(--danger);border-radius:var(--radius);padding:11px 14px;
+    font-size:13.5px;margin-bottom:16px;
+  }
+  #errorBanner.show{display:block;}
+
+  .video-card{
+    border:1px solid var(--border);border-radius:12px;padding:16px;
+    margin-bottom:12px;background:var(--surface-2);
+  }
+  .video-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .video-card-actions{display:flex;gap:6px;}
+  .video-badge{font-family:"Fraunces",serif;font-weight:600;font-size:15px;color:var(--accent-strong);}
+  .icon-btn{
+    background:transparent;border:1px solid var(--border);color:var(--muted);
+    width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:13px;line-height:1;
+  }
+  .icon-btn:hover{border-color:var(--danger);color:var(--danger);}
+  .icon-btn:disabled{opacity:.35;cursor:default;}
+  .icon-btn:disabled:hover{border-color:var(--border);color:var(--muted);}
+
+  .field{margin-bottom:12px;}
+  .field:last-child{margin-bottom:0;}
+  .field-label{
+    display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);
+    text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;
+  }
+  .field-hint{margin:5px 0 0;font-size:12px;color:var(--muted);}
+  .field-row{display:flex;gap:10px;}
+  .field-row > div{flex:1;}
+  input[type="url"], input[type="text"]{
+    width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:8px;padding:9px 11px;
+  }
+  input:focus{ outline:2px solid var(--focus); outline-offset:1px; }
+  input.field-error{ border-color:var(--danger); }
+
+  #addVideoBtn{
+    width:100%;background:transparent;border:1.5px dashed var(--border);
+    color:var(--ink-soft);border-radius:10px;padding:11px;
+    font-family:inherit;font-size:13.5px;font-weight:500;cursor:pointer;
+  }
+  #addVideoBtn:hover{border-color:var(--accent);color:var(--accent-strong);}
+
+  .primary-btn{
+    background:var(--accent);color:var(--accent-ink);border:none;
+    border-radius:9px;padding:12px 18px;font-family:inherit;font-size:14.5px;
+    font-weight:600;cursor:pointer;width:100%;margin-top:18px;
+  }
+  .primary-btn:hover{background:var(--accent-strong);}
+
+  .preview-panel{position:sticky;top:16px;}
+  .preview-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .preview-head h2{font-family:"Fraunces",serif;font-size:16px;font-weight:600;margin:0;}
+  .width-toggle{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .width-toggle button{background:var(--surface);border:none;color:var(--ink-soft);font-size:12px;padding:5px 10px;cursor:pointer;}
+  .width-toggle button + button{border-left:1px solid var(--border);}
+  .width-toggle button.active{background:var(--accent);color:var(--accent-ink);}
+
+  .preview-frame-outer{
+    background:var(--surface-2);border:1px solid var(--border);border-radius:12px;
+    padding:14px;display:flex;justify-content:center;
+  }
+  #previewIframe{
+    width:100%;max-width:100%;height:560px;border:none;background:#fff;
+    border-radius:6px;transition:max-width .2s ease;
+  }
+  .preview-frame-outer.mobile #previewIframe{max-width:360px;height:640px;}
+
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(20,16,8,.55);display:none;
+    align-items:center;justify-content:center;padding:20px;z-index:100;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:var(--surface);border:1px solid var(--border);border-radius:14px;
+    max-width:720px;width:100%;max-height:85vh;display:flex;flex-direction:column;padding:20px;
+  }
+  .modal-box h2{font-family:"Fraunces",serif;font-size:18px;margin:0 0 4px;}
+  .modal-box p{margin:0 0 14px;color:var(--ink-soft);font-size:13.5px;}
+  #codeOutput, #importInput{
+    flex:1;min-height:260px;font-family:ui-monospace,Menlo,Consolas,monospace;
+    font-size:12px;line-height:1.5;background:var(--bg);color:var(--ink);
+    border:1px solid var(--border);border-radius:8px;padding:12px;resize:vertical;
+  }
+  .import-error{
+    margin-top:10px;background:var(--danger-bg);border:1px solid var(--danger);
+    color:var(--danger);border-radius:8px;padding:9px 12px;font-size:13px;
+  }
+  .import-error[hidden]{display:none;}
+  .modal-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+  .modal-actions button{
+    font-family:inherit;font-size:13.5px;font-weight:600;border-radius:8px;
+    padding:9px 16px;cursor:pointer;border:1px solid var(--border);
+    background:var(--surface);color:var(--ink);
+  }
+  .modal-actions .primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
+  .modal-actions .primary:hover{background:var(--accent-strong);}
+  .modal-actions .ghost:hover{border-color:var(--accent);}
+  #closeModalBtn{margin-left:auto;}
+
+  .toast{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(8px);
+    background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;
+    font-size:13px;opacity:0;pointer-events:none;transition:opacity .18s ease, transform .18s ease;z-index:200;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <h1>YouTube Video Grid Builder</h1>
+    <p>Paste your YouTube video links below (thumbnails and titles are pulled in automatically), preview the grid exactly as it'll appear, then copy the embed code into a Squarespace code block.</p>
+  </header>
+
+  <div class="layout">
+    <div class="panel">
+      <div class="panel-top-actions">
+        <button type="button" class="ghost-link-btn" id="openImportBtn">Load from existing embed code&hellip;</button>
+      </div>
+      <div id="errorBanner"></div>
+      <div id="videosContainer"></div>
+      <button type="button" id="addVideoBtn">+ Add another video</button>
+      <button type="button" class="primary-btn" id="getCodeBtn">Get embed code</button>
+    </div>
+
+    <div class="panel preview-panel">
+      <div class="preview-head">
+        <h2>Live preview</h2>
+        <div class="width-toggle">
+          <button type="button" data-width="desktop" class="active">Desktop</button>
+          <button type="button" data-width="mobile">Mobile</button>
+        </div>
+      </div>
+      <div class="preview-frame-outer" id="previewOuter">
+        <iframe id="previewIframe" title="Video grid preview"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <h2>Embed code</h2>
+    <p>Paste this into a Squarespace code block wherever you want the video grid to appear.</p>
+    <textarea id="codeOutput" readonly></textarea>
+    <div class="modal-actions">
+      <button type="button" class="primary" id="copyCodeBtn">Copy code</button>
+      <button type="button" class="ghost" id="closeModalBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="importModalOverlay">
+  <div class="modal-box">
+    <h2>Load from existing embed code</h2>
+    <p>Paste the embed code you last put into Squarespace, and it'll rebuild the video list below.</p>
+    <textarea id="importInput" placeholder="Paste the full embed code here&hellip;"></textarea>
+    <div id="importError" class="import-error" hidden></div>
+    <div class="modal-actions">
+      <button type="button" class="primary" id="loadImportBtn">Load videos</button>
+      <button type="button" class="ghost" id="closeImportModalBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  function newVideo(overrides){
+    return Object.assign({ title:"", url:"", duration:"" }, overrides || {});
+  }
+
+  // Remembers your last edits in this browser, on this device, so refreshing
+  // the page (or coming back later) picks up where you left off. On a
+  // different device, use "Load from existing embed code" instead.
+  var STORAGE_KEY = "youtubeVideoGridBuilder.videos.v1";
+
+  function persistVideos(){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(videos)); }
+    catch(err){ /* storage unavailable — not fatal, just skip remembering */ }
+  }
+
+  function loadInitialVideos(){
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        var saved = JSON.parse(raw);
+        if(Array.isArray(saved) && saved.length > 0){
+          restoredFromStorage = true;
+          return saved.map(function(v){ return newVideo(v); });
+        }
+      }
+    } catch(err){ /* fall through to the default example below */ }
+    return [ newVideo(), newVideo(), newVideo() ];
+  }
+
+  var restoredFromStorage = false;
+  var videos = loadInitialVideos();
+
+  var container = document.getElementById("videosContainer");
+  var addBtn = document.getElementById("addVideoBtn");
+  var errorBanner = document.getElementById("errorBanner");
+  var iframe = document.getElementById("previewIframe");
+
+  // ---- YouTube URL parsing (shared with the exported embed's own copy) ----
+  function extractYouTubeId(url){
+    if(!url) return null;
+    url = url.trim();
+    var patterns = [
+      /youtube\.com\/watch\?[^#]*\bv=([\w-]{11})/,
+      /youtu\.be\/([\w-]{11})/,
+      /youtube\.com\/embed\/([\w-]{11})/,
+      /youtube\.com\/shorts\/([\w-]{11})/
+    ];
+    for(var i=0;i<patterns.length;i++){
+      var m = url.match(patterns[i]);
+      if(m) return m[1];
+    }
+    if(/^[\w-]{11}$/.test(url)) return url;
+    return null;
+  }
+
+  function cardTemplate(i){
+    return (
+      '<div class="video-card" id="card-' + i + '" data-idx="' + i + '">' +
+        '<div class="video-card-head">' +
+          '<span class="video-badge">Video ' + (i+1) + '</span>' +
+          '<div class="video-card-actions">' +
+            '<button type="button" class="icon-btn" data-action="moveUp" data-idx="' + i + '" aria-label="Move video ' + (i+1) + ' up" title="Move up"' + (i === 0 ? ' disabled' : '') + '>\u2191</button>' +
+            '<button type="button" class="icon-btn" data-action="moveDown" data-idx="' + i + '" aria-label="Move video ' + (i+1) + ' down" title="Move down"' + (i === videos.length - 1 ? ' disabled' : '') + '>\u2193</button>' +
+            '<button type="button" class="icon-btn" data-action="remove" data-idx="' + i + '" aria-label="Remove video ' + (i+1) + '"' + (videos.length <= 1 ? ' disabled' : '') + '>\u2715</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="field">' +
+          '<label class="field-label" for="url-' + i + '">YouTube link</label>' +
+          '<input type="url" id="url-' + i + '" data-role="url" data-idx="' + i + '" placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/...">' +
+        '</div>' +
+        '<div class="field-row">' +
+          '<div class="field">' +
+            '<label class="field-label" for="title-' + i + '">Title</label>' +
+            '<input type="text" id="title-' + i + '" data-role="title" data-idx="' + i + '" placeholder="Video title as it should show under the thumbnail">' +
+          '</div>' +
+          '<div class="field" style="max-width:130px;">' +
+            '<label class="field-label" for="duration-' + i + '">Duration</label>' +
+            '<input type="text" id="duration-' + i + '" data-role="duration" data-idx="' + i + '" placeholder="00:05:11">' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function applyVideoToCard(i){
+    var v = videos[i];
+    var urlInput = document.getElementById("url-" + i);
+    if(document.activeElement !== urlInput) urlInput.value = v.url;
+    var titleInput = document.getElementById("title-" + i);
+    if(document.activeElement !== titleInput) titleInput.value = v.title;
+    var durationInput = document.getElementById("duration-" + i);
+    if(document.activeElement !== durationInput) durationInput.value = v.duration;
+  }
+
+  function renderAllCards(){
+    container.innerHTML = videos.map(function(_, i){ return cardTemplate(i); }).join("");
+    videos.forEach(function(_, i){ applyVideoToCard(i); });
+  }
+
+  var debounceTimer = null;
+  function schedulePreview(){
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(updatePreview, 150);
+  }
+
+  container.addEventListener("input", function(e){
+    var role = e.target.dataset.role, idx = e.target.dataset.idx !== undefined ? +e.target.dataset.idx : null;
+    if(idx === null) return;
+    if(role === "url"){ videos[idx].url = e.target.value; schedulePreview(); }
+    else if(role === "title"){ videos[idx].title = e.target.value; schedulePreview(); }
+    else if(role === "duration"){ videos[idx].duration = e.target.value; schedulePreview(); }
+  });
+
+  container.addEventListener("click", function(e){
+    var btn = e.target.closest("[data-action]");
+    if(!btn || btn.disabled) return;
+    var action = btn.dataset.action, idx = +btn.dataset.idx;
+    if(action === "remove"){
+      if(videos.length <= 1) return;
+      videos.splice(idx, 1);
+      renderAllCards();
+      updatePreview();
+    } else if(action === "moveUp"){
+      if(idx > 0){
+        var tmpUp = videos[idx - 1]; videos[idx - 1] = videos[idx]; videos[idx] = tmpUp;
+        renderAllCards(); updatePreview();
+      }
+    } else if(action === "moveDown"){
+      if(idx < videos.length - 1){
+        var tmpDown = videos[idx + 1]; videos[idx + 1] = videos[idx]; videos[idx] = tmpDown;
+        renderAllCards(); updatePreview();
+      }
+    }
+  });
+
+  addBtn.addEventListener("click", function(){
+    videos.push(newVideo());
+    renderAllCards();
+    updatePreview();
+  });
+
+  document.querySelectorAll(".width-toggle button").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll(".width-toggle button").forEach(function(b){ b.classList.remove("active"); });
+      btn.classList.add("active");
+      document.getElementById("previewOuter").classList.toggle("mobile", btn.dataset.width === "mobile");
+    });
+  });
+
+  // ---- building the embeddable fragment ----
+  // This exact function's output (as a string) is what gets exported, and
+  // it's also what feeds the live preview iframe, so preview and export
+  // can never drift apart.
+  function buildFragment(runtimeVideos){
+    var videosJson = JSON.stringify(runtimeVideos);
+    return (
+'<div class="yt-video-grid" id="ytVideoGrid">\n' +
+'  <div class="yt-grid" id="ytGrid"></div>\n' +
+'  <div class="yt-pagination" id="ytPagination"></div>\n' +
+'</div>\n' +
+'<div class="yt-modal-overlay" id="ytModalOverlay">\n' +
+'  <div class="yt-modal-box">\n' +
+'    <button type="button" class="yt-modal-close" id="ytModalClose" aria-label="Close">&times;</button>\n' +
+'    <div class="yt-modal-frame-wrap"><iframe id="ytModalFrame" title="Video player" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>\n' +
+'  </div>\n' +
+'</div>\n' +
+'<style>\n' +
+'.yt-video-grid { max-width: 1280px; margin: auto; padding: 0 12px; }\n' +
+'.yt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px 24px; align-items: start; }\n' +
+'.yt-card { cursor: pointer; border: none; background: none; padding: 0; text-align: left; font-family: inherit; display: block; width: 100%; }\n' +
+'.yt-thumb-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 6px; overflow: hidden; background: #000; }\n' +
+'.yt-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .2s ease; }\n' +
+'.yt-card:hover .yt-thumb-wrap img { transform: scale(1.03); }\n' +
+'.yt-play-badge { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 54px; height: 54px; border-radius: 50%; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .15s ease; pointer-events: none; }\n' +
+'.yt-card:hover .yt-play-badge { opacity: 1; }\n' +
+'.yt-duration { position: absolute; right: 8px; bottom: 8px; background: rgba(0,0,0,0.8); color: #fff; font-size: 12px; font-weight: 600; padding: 2px 6px; border-radius: 3px; line-height: 1.4; }\n' +
+'.yt-title { margin-top: 12px; font-size: 15px; font-weight: 700; line-height: 1.35; color: #111; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: calc(1.35em * 2); }\n' +
+'.yt-pagination { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 32px; font-size: 14px; }\n' +
+'.yt-pagination button { border: none; background: none; cursor: pointer; font-family: inherit; font-size: 14px; color: #333; width: 30px; height: 30px; border-radius: 4px; }\n' +
+'.yt-pagination button.active { background: #e7e5e0; font-weight: 700; }\n' +
+'.yt-pagination button:disabled { opacity: 0.35; cursor: default; }\n' +
+'.yt-modal-overlay { position: fixed; inset: 0; background: rgba(10,10,10,0.85); display: none; align-items: center; justify-content: center; padding: 24px; z-index: 2147483000; pointer-events: auto; }\n' +
+'.yt-modal-overlay.show { display: flex; }\n' +
+'.yt-modal-box { position: relative; width: 100%; max-width: 960px; }\n' +
+'.yt-modal-frame-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; }\n' +
+'.yt-modal-frame-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }\n' +
+'.yt-modal-close { position: absolute; top: -40px; right: 0; background: none; border: none; color: #fff; font-size: 32px; line-height: 1; cursor: pointer; padding: 4px 8px; z-index: 2; pointer-events: auto; }\n' +
+'@media (max-width: 900px) {\n' +
+'  .yt-grid { grid-template-columns: repeat(2, 1fr); gap: 22px 16px; }\n' +
+'}\n' +
+'@media (max-width: 640px) {\n' +
+'  .yt-grid { display: flex; flex-direction: column; grid-template-columns: none; gap: 22px; }\n' +
+'  .yt-card { display: flex; flex-direction: row; align-items: flex-start; gap: 14px; width: 100%; }\n' +
+'  .yt-thumb-wrap { flex: 0 0 40%; width: 40%; }\n' +
+'  .yt-play-badge { opacity: 1; width: 34px; height: 34px; }\n' +
+'  .yt-play-badge svg { width: 16px; height: 16px; }\n' +
+'  .yt-duration { font-size: 10px; padding: 1px 5px; }\n' +
+'  .yt-title { margin-top: 0; font-size: 14.5px; line-height: 1.35; -webkit-line-clamp: 4; min-height: 0; flex: 1; }\n' +
+'  .yt-pagination { margin-top: 20px; }\n' +
+'  .yt-modal-close { top: -36px; font-size: 28px; }\n' +
+'}\n' +
+'</style>\n' +
+'<script>\n' +
+'(function(){\n' +
+'  var videos = ' + videosJson + ';\n' +
+'  var MOBILE_QUERY = "(max-width: 640px)";\n' +
+'  function getPerPage(){ return (window.matchMedia && window.matchMedia(MOBILE_QUERY).matches) ? 3 : 6; }\n' +
+'  var PER_PAGE = getPerPage();\n' +
+'  var page = 1;\n' +
+'  var totalPages = Math.max(1, Math.ceil(videos.length / PER_PAGE));\n' +
+'  var grid = document.getElementById("ytGrid");\n' +
+'  var pagination = document.getElementById("ytPagination");\n' +
+'  var overlay = document.getElementById("ytModalOverlay");\n' +
+'  var frame = document.getElementById("ytModalFrame");\n' +
+'  // Move the modal to the very end of <body>. Squarespace section wrappers\n' +
+'  // often carry a CSS transform (used for their scroll/parallax animations),\n' +
+'  // and a transform on any ancestor makes position:fixed children act as if\n' +
+'  // they were positioned relative to THAT ancestor instead of the viewport —\n' +
+'  // which can hide the close button off-screen or behind other sections.\n' +
+'  // Re-parenting to <body> sidesteps that entirely.\n' +
+'  if(overlay && overlay.parentNode !== document.body){\n' +
+'    document.body.appendChild(overlay);\n' +
+'  }\n' +
+'  function renderGrid(){\n' +
+'    grid.innerHTML = "";\n' +
+'    var start = (page - 1) * PER_PAGE;\n' +
+'    videos.slice(start, start + PER_PAGE).forEach(function(v){\n' +
+'      var card = document.createElement("button");\n' +
+'      card.type = "button";\n' +
+'      card.className = "yt-card";\n' +
+'      var thumbWrap = document.createElement("div");\n' +
+'      thumbWrap.className = "yt-thumb-wrap";\n' +
+'      var img = document.createElement("img");\n' +
+'      img.src = "https://img.youtube.com/vi/" + v.id + "/hqdefault.jpg";\n' +
+'      img.alt = v.title || "";\n' +
+'      img.loading = "lazy";\n' +
+'      thumbWrap.appendChild(img);\n' +
+'      var playBadge = document.createElement("div");\n' +
+'      playBadge.className = "yt-play-badge";\n' +
+'      playBadge.innerHTML = "<svg width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 24 24\\"><path d=\\"M8 5v14l11-7z\\" fill=\\"white\\"/></svg>";\n' +
+'      thumbWrap.appendChild(playBadge);\n' +
+'      if(v.duration){\n' +
+'        var dur = document.createElement("span");\n' +
+'        dur.className = "yt-duration";\n' +
+'        dur.textContent = v.duration;\n' +
+'        thumbWrap.appendChild(dur);\n' +
+'      }\n' +
+'      card.appendChild(thumbWrap);\n' +
+'      if(v.title){\n' +
+'        var titleEl = document.createElement("div");\n' +
+'        titleEl.className = "yt-title";\n' +
+'        titleEl.textContent = v.title;\n' +
+'        card.appendChild(titleEl);\n' +
+'      }\n' +
+'      card.addEventListener("click", function(){ openVideoModal(v.id); });\n' +
+'      grid.appendChild(card);\n' +
+'    });\n' +
+'  }\n' +
+'  function renderPagination(){\n' +
+'    pagination.innerHTML = "";\n' +
+'    if(totalPages <= 1) return;\n' +
+'    var prev = document.createElement("button");\n' +
+'    prev.type = "button"; prev.textContent = "\\u2039"; prev.disabled = page === 1;\n' +
+'    prev.addEventListener("click", function(){ goToPage(page - 1); });\n' +
+'    pagination.appendChild(prev);\n' +
+'    for(var p = 1; p <= totalPages; p++){\n' +
+'      (function(p){\n' +
+'        var b = document.createElement("button");\n' +
+'        b.type = "button"; b.textContent = String(p);\n' +
+'        if(p === page) b.classList.add("active");\n' +
+'        b.addEventListener("click", function(){ goToPage(p); });\n' +
+'        pagination.appendChild(b);\n' +
+'      })(p);\n' +
+'    }\n' +
+'    var next = document.createElement("button");\n' +
+'    next.type = "button"; next.textContent = "\\u203a"; next.disabled = page === totalPages;\n' +
+'    next.addEventListener("click", function(){ goToPage(page + 1); });\n' +
+'    pagination.appendChild(next);\n' +
+'  }\n' +
+'  function goToPage(p){\n' +
+'    if(p < 1 || p > totalPages) return;\n' +
+'    page = p;\n' +
+'    renderGrid();\n' +
+'    renderPagination();\n' +
+'  }\n' +
+'  function openVideoModal(id){\n' +
+'    frame.src = "https://www.youtube.com/embed/" + id + "?autoplay=1&rel=0";\n' +
+'    overlay.classList.add("show");\n' +
+'    document.body.style.overflow = "hidden";\n' +
+'  }\n' +
+'  function closeVideoModal(){\n' +
+'    overlay.classList.remove("show");\n' +
+'    frame.src = "";\n' +
+'    document.body.style.overflow = "";\n' +
+'  }\n' +
+'  document.getElementById("ytModalClose").addEventListener("click", function(e){\n' +
+'    e.preventDefault();\n' +
+'    e.stopPropagation();\n' +
+'    closeVideoModal();\n' +
+'  });\n' +
+'  overlay.addEventListener("click", function(e){ if(e.target === overlay) closeVideoModal(); });\n' +
+'  document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeVideoModal(); });\n' +
+'  var resizeTimer = null;\n' +
+'  window.addEventListener("resize", function(){\n' +
+'    clearTimeout(resizeTimer);\n' +
+'    resizeTimer = setTimeout(function(){\n' +
+'      var newPerPage = getPerPage();\n' +
+'      if(newPerPage !== PER_PAGE){\n' +
+'        PER_PAGE = newPerPage;\n' +
+'        totalPages = Math.max(1, Math.ceil(videos.length / PER_PAGE));\n' +
+'        page = Math.min(page, totalPages);\n' +
+'        renderGrid();\n' +
+'        renderPagination();\n' +
+'      }\n' +
+'    }, 150);\n' +
+'  });\n' +
+'  renderGrid();\n' +
+'  renderPagination();\n' +
+'})();\n' +
+'<\/script>'
+    );
+  }
+
+  function toRuntimeVideo(v){
+    var id = extractYouTubeId(v.url);
+    return { id: id || "", title: v.title || "", duration: v.duration || "" };
+  }
+
+  function updatePreview(){
+    var runtimeVideos = videos.map(toRuntimeVideo).filter(function(v){ return v.id; });
+    var fragment = buildFragment(runtimeVideos);
+    var doc = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+      '<style>html,body{margin:0;background:#fff;color:#222;font-family:system-ui,-apple-system,sans-serif;padding:20px 0;}</style></head><body>' + fragment + '</body></html>';
+    iframe.srcdoc = doc;
+    persistVideos();
+  }
+
+  // ---- export / validation ----
+  function showError(msg){ errorBanner.textContent = msg; errorBanner.classList.add("show"); }
+  function clearErrors(){
+    errorBanner.classList.remove("show");
+    document.querySelectorAll(".field-error").forEach(function(el){ el.classList.remove("field-error"); });
+  }
+
+  document.getElementById("getCodeBtn").addEventListener("click", function(){
+    clearErrors();
+    var firstBad = null;
+    videos.forEach(function(v, i){
+      var urlInput = document.getElementById("url-" + i);
+      var id = extractYouTubeId(v.url);
+      if(!v.url.trim() || !id){
+        urlInput.classList.add("field-error");
+        if(!firstBad) firstBad = urlInput;
+      }
+    });
+    if(firstBad){
+      showError("Add a valid YouTube link for the highlighted video(s) before generating the code.");
+      firstBad.scrollIntoView({ behavior: "smooth", block: "center" });
+      firstBad.focus();
+      return;
+    }
+    var runtimeVideos = videos.map(toRuntimeVideo);
+    var code = buildFragment(runtimeVideos);
+    document.getElementById("codeOutput").value = code;
+    document.getElementById("modalOverlay").classList.add("show");
+  });
+
+  document.getElementById("closeModalBtn").addEventListener("click", function(){
+    document.getElementById("modalOverlay").classList.remove("show");
+  });
+  document.getElementById("modalOverlay").addEventListener("click", function(e){
+    if(e.target.id === "modalOverlay") e.currentTarget.classList.remove("show");
+  });
+
+  // ---- import: rebuild videos from previously-exported embed code ----
+  function parseEmbedCode(code){
+    var doc = new DOMParser().parseFromString(code, "text/html");
+    var scriptEl = doc.querySelector("script");
+    var scriptText = scriptEl ? scriptEl.textContent : "";
+    var match = scriptText.match(/var\s+videos\s*=\s*(\[[\s\S]*?\]);/);
+    if(!match){
+      throw new Error("Couldn't find video data in that code — make sure you pasted the full embed code, including the <script> part.");
+    }
+    var videosJson;
+    try { videosJson = JSON.parse(match[1]); }
+    catch(err){ throw new Error("That code's video data looks corrupted — try re-pasting the whole thing."); }
+    if(!Array.isArray(videosJson) || videosJson.length === 0){
+      throw new Error("No videos found in that code.");
+    }
+    return videosJson.map(function(v){
+      return newVideo({
+        url: v.id ? ("https://www.youtube.com/watch?v=" + v.id) : "",
+        title: v.title || "",
+        duration: v.duration || ""
+      });
+    });
+  }
+
+  var importOverlay = document.getElementById("importModalOverlay");
+  var importInput = document.getElementById("importInput");
+  var importError = document.getElementById("importError");
+
+  document.getElementById("openImportBtn").addEventListener("click", function(){
+    importInput.value = "";
+    importError.hidden = true;
+    importOverlay.classList.add("show");
+    importInput.focus();
+  });
+  document.getElementById("closeImportModalBtn").addEventListener("click", function(){
+    importOverlay.classList.remove("show");
+  });
+  importOverlay.addEventListener("click", function(e){
+    if(e.target.id === "importModalOverlay") importOverlay.classList.remove("show");
+  });
+
+  document.getElementById("loadImportBtn").addEventListener("click", function(){
+    importError.hidden = true;
+    var code = importInput.value.trim();
+    if(!code){
+      importError.textContent = "Paste the embed code first.";
+      importError.hidden = false;
+      return;
+    }
+    try {
+      videos = parseEmbedCode(code);
+      renderAllCards();
+      updatePreview();
+      importOverlay.classList.remove("show");
+      showToast("Loaded " + videos.length + " video" + (videos.length === 1 ? "" : "s"));
+    } catch(err){
+      importError.textContent = err.message || "Couldn't read that code.";
+      importError.hidden = false;
+    }
+  });
+
+  function showToast(msg){
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 1600);
+  }
+
+  document.getElementById("copyCodeBtn").addEventListener("click", function(){
+    var ta = document.getElementById("codeOutput");
+    ta.select();
+    try {
+      navigator.clipboard.writeText(ta.value).then(function(){ showToast("Code copied"); }).catch(function(){
+        document.execCommand("copy"); showToast("Code copied");
+      });
+    } catch(e){ document.execCommand("copy"); showToast("Code copied"); }
+  });
+
+  // ---- init ----
+  renderAllCards();
+  updatePreview();
+  if(restoredFromStorage) showToast("Restored your last edits on this device");
+})();
+</script>
+
+</body></html>
