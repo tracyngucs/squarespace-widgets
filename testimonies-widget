@@ -1,0 +1,516 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Testimonies Section Builder (Videos / Words Tabs)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#f6f2ea;
+    --surface:#ffffff;
+    --surface-2:#efe7d8;
+    --border:#ddd0b4;
+    --ink:#241f16;
+    --ink-soft:#5c5240;
+    --muted:#8c8065;
+    --accent:#a8752f;
+    --accent-strong:#7f5920;
+    --accent-ink:#fffaf0;
+    --danger:#b3432b;
+    --danger-bg:#fbeae5;
+    --focus:#a8752f;
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#16130d; --surface:#201a12; --surface-2:#2a2216; --border:#3c3220;
+      --ink:#f3ebd9; --ink-soft:#cdbfa0; --muted:#988b6c;
+      --accent:#d8a24e; --accent-strong:#eab766; --accent-ink:#1a1409;
+      --danger:#e2836a; --danger-bg:#3a2018;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#16130d; --surface:#201a12; --surface-2:#2a2216; --border:#3c3220;
+    --ink:#f3ebd9; --ink-soft:#cdbfa0; --muted:#988b6c;
+    --accent:#d8a24e; --accent-strong:#eab766; --accent-ink:#1a1409;
+    --danger:#e2836a; --danger-bg:#3a2018;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Inter",system-ui,-apple-system,sans-serif;
+    padding:28px 16px 60px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+  header.page-head{margin-bottom:22px;}
+  h1{
+    font-family:"Fraunces",Georgia,serif;
+    font-weight:600;
+    font-size:clamp(24px,3vw,32px);
+    letter-spacing:-0.01em;
+    text-wrap:balance;
+    margin:0 0 6px;
+  }
+  .page-head p{margin:0;color:var(--ink-soft);font-size:14.5px;max-width:70ch;}
+
+  .layout{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(300px,420px);
+    gap:22px;
+    align-items:start;
+  }
+  @media (max-width:880px){ .layout{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px;
+  }
+
+  .panel-top-actions{display:flex;justify-content:flex-end;margin-bottom:12px;}
+  .ghost-link-btn{
+    background:transparent;border:none;color:var(--accent-strong);
+    font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+    padding:2px 0;text-decoration:underline;text-underline-offset:2px;
+  }
+  .ghost-link-btn:hover{color:var(--accent);}
+
+  #errorBanner{
+    display:none;background:var(--danger-bg);border:1px solid var(--danger);
+    color:var(--danger);border-radius:var(--radius);padding:11px 14px;
+    font-size:13.5px;margin-bottom:16px;
+  }
+  #errorBanner.show{display:block;}
+
+  .field{margin-bottom:18px;}
+  .field:last-child{margin-bottom:0;}
+  .field-label{
+    display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);
+    text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;
+  }
+  .field-hint{margin:5px 0 0;font-size:12px;color:var(--muted);}
+  input[type="text"]{
+    width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:8px;padding:9px 11px;
+  }
+  textarea.code-paste{
+    width:100%;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.5;
+    color:var(--ink);background:var(--bg);border:1px solid var(--border);
+    border-radius:8px;padding:11px;resize:vertical;min-height:150px;
+  }
+  input:focus, textarea:focus{ outline:2px solid var(--focus); outline-offset:1px; }
+  input.field-error, textarea.field-error{ border-color:var(--danger); }
+
+  .section-block{
+    background:var(--surface-2); border:1px solid var(--border); border-radius:12px;
+    padding:16px; margin-bottom:18px;
+  }
+  .section-block-title{
+    font-family:"Fraunces",serif; font-weight:600; font-size:15px; color:var(--accent-strong);
+    margin-bottom:12px;
+  }
+
+  .labels-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:480px){ .labels-row{grid-template-columns:1fr;} }
+
+  .primary-btn{
+    background:var(--accent); color:var(--accent-ink); border:none;
+    border-radius:9px; padding:12px 18px; font-family:inherit; font-size:14.5px;
+    font-weight:600; cursor:pointer; width:100%; margin-top:4px;
+  }
+  .primary-btn:hover{background:var(--accent-strong);}
+
+  .preview-panel{position:sticky;top:16px;}
+  .preview-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .preview-head h2{font-family:"Fraunces",serif;font-size:16px;font-weight:600;margin:0;}
+  .width-toggle{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .width-toggle button{background:var(--surface);border:none;color:var(--ink-soft);font-size:12px;padding:5px 10px;cursor:pointer;}
+  .width-toggle button + button{border-left:1px solid var(--border);}
+  .width-toggle button.active{background:var(--accent);color:var(--accent-ink);}
+
+  .preview-frame-outer{
+    background:var(--surface-2); border:1px solid var(--border); border-radius:12px;
+    padding:14px; display:flex; justify-content:center;
+  }
+  #previewIframe{
+    width:100%; max-width:100%; height:640px; border:none; background:#fff;
+    border-radius:6px; transition:max-width .2s ease;
+  }
+  .preview-frame-outer.mobile #previewIframe{max-width:360px;height:680px;}
+
+  .modal-overlay{
+    position:fixed;inset:0; background:rgba(20,16,8,.55); display:none;
+    align-items:center; justify-content:center; padding:20px; z-index:100;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    max-width:720px; width:100%; max-height:85vh; display:flex; flex-direction:column; padding:20px;
+  }
+  .modal-box h2{font-family:"Fraunces",serif;font-size:18px;margin:0 0 4px;}
+  .modal-box p{margin:0 0 14px;color:var(--ink-soft);font-size:13.5px;}
+  #codeOutput, #importInput{
+    flex:1; min-height:260px; font-family:ui-monospace,Menlo,Consolas,monospace;
+    font-size:12px; line-height:1.5; background:var(--bg); color:var(--ink);
+    border:1px solid var(--border); border-radius:8px; padding:12px; resize:vertical;
+  }
+  .import-error{
+    margin-top:10px; background:var(--danger-bg); border:1px solid var(--danger);
+    color:var(--danger); border-radius:8px; padding:9px 12px; font-size:13px;
+  }
+  .import-error[hidden]{display:none;}
+  .modal-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+  .modal-actions button{
+    font-family:inherit; font-size:13.5px; font-weight:600; border-radius:8px;
+    padding:9px 16px; cursor:pointer; border:1px solid var(--border);
+    background:var(--surface); color:var(--ink);
+  }
+  .modal-actions .primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
+  .modal-actions .primary:hover{background:var(--accent-strong);}
+  .modal-actions .ghost:hover{border-color:var(--accent);}
+  #closeModalBtn{margin-left:auto;}
+
+  .toast{
+    position:fixed; bottom:22px;left:50%; transform:translateX(-50%) translateY(8px);
+    background:var(--ink); color:var(--bg); padding:9px 16px; border-radius:8px;
+    font-size:13px; opacity:0; pointer-events:none; transition:opacity .18s ease, transform .18s ease; z-index:200;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <h1>Testimonies Section Builder</h1>
+    <p>Combines your existing Video Grid and Testimony Image Filter widgets into one section with a "Watch Videos / Read Testimonies" tab toggle. Export the embed code from each of those builders first, then paste both here.</p>
+  </header>
+
+  <div class="layout">
+    <div class="panel">
+      <div class="panel-top-actions">
+        <button type="button" class="ghost-link-btn" id="openImportBtn">Load from existing embed code&hellip;</button>
+      </div>
+      <div id="errorBanner"></div>
+
+      <div class="section-block">
+        <div class="section-block-title">Tab labels</div>
+        <div class="labels-row">
+          <div class="field">
+            <label class="field-label" for="videoLabelInput">Videos tab label</label>
+            <input type="text" id="videoLabelInput" value="WATCH VIDEOS">
+          </div>
+          <div class="field">
+            <label class="field-label" for="testimonyLabelInput">Testimonies tab label</label>
+            <input type="text" id="testimonyLabelInput" value="READ TESTIMONIES">
+          </div>
+        </div>
+        <p class="field-hint">The Videos tab shows first when the page loads.</p>
+      </div>
+
+      <div class="section-block">
+        <div class="section-block-title">Videos tab content</div>
+        <div class="field">
+          <label class="field-label" for="videoCodeInput">Video Grid embed code</label>
+          <textarea class="code-paste" id="videoCodeInput" placeholder="Paste the embed code you exported from the YouTube Video Grid Builder here&hellip;"></textarea>
+          <p class="field-hint">Open your Video Grid builder, click "Get embed code", copy it, and paste it here as-is.</p>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <div class="section-block-title">Testimonies tab content</div>
+        <div class="field">
+          <label class="field-label" for="testimonyCodeInput">Testimony Image Filter embed code</label>
+          <textarea class="code-paste" id="testimonyCodeInput" placeholder="Paste the embed code you exported from the Testimony Category Image Builder here&hellip;"></textarea>
+          <p class="field-hint">Open your Testimony Image builder, click "Get embed code", copy it, and paste it here as-is.</p>
+        </div>
+      </div>
+
+      <button type="button" class="primary-btn" id="getCodeBtn">Get combined embed code</button>
+    </div>
+
+    <div class="panel preview-panel">
+      <div class="preview-head">
+        <h2>Live preview</h2>
+        <div class="width-toggle">
+          <button type="button" data-width="desktop" class="active">Desktop</button>
+          <button type="button" data-width="mobile">Mobile</button>
+        </div>
+      </div>
+      <div class="preview-frame-outer" id="previewOuter">
+        <iframe id="previewIframe" title="Testimonies section preview"></iframe>
+      </div>
+      <p class="field-hint" style="margin-top:10px;">The Testimonies tab may show "couldn't load" here — this builder page can't reach your Squarespace site directly. It will load your real testimonies once embedded on kogsc.org.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <h2>Embed code</h2>
+    <p>Paste this into a Squarespace code block wherever you want the tabbed testimonies section to appear.</p>
+    <textarea id="codeOutput" readonly></textarea>
+    <div class="modal-actions">
+      <button type="button" class="primary" id="copyCodeBtn">Copy code</button>
+      <button type="button" class="ghost" id="closeModalBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="importModalOverlay">
+  <div class="modal-box">
+    <h2>Load from existing embed code</h2>
+    <p>Paste the combined embed code you last put into Squarespace, and it'll rebuild the fields below.</p>
+    <textarea id="importInput" placeholder="Paste the full combined embed code here&hellip;"></textarea>
+    <div id="importError" class="import-error" hidden></div>
+    <div class="modal-actions">
+      <button type="button" class="primary" id="loadImportBtn">Load</button>
+      <button type="button" class="ghost" id="closeImportModalBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "testimoniesTabsBuilder.v1";
+
+  var videoCodeInput = document.getElementById("videoCodeInput");
+  var testimonyCodeInput = document.getElementById("testimonyCodeInput");
+  var videoLabelInput = document.getElementById("videoLabelInput");
+  var testimonyLabelInput = document.getElementById("testimonyLabelInput");
+  var errorBanner = document.getElementById("errorBanner");
+  var iframe = document.getElementById("previewIframe");
+
+  var restoredFromStorage = false;
+
+  function persistState(){
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        videoCode: videoCodeInput.value,
+        testimonyCode: testimonyCodeInput.value,
+        videoLabel: videoLabelInput.value,
+        testimonyLabel: testimonyLabelInput.value
+      }));
+    } catch(err){ /* storage unavailable — not fatal */ }
+  }
+
+  (function loadInitialState(){
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        var saved = JSON.parse(raw);
+        if(saved){
+          videoCodeInput.value = saved.videoCode || "";
+          testimonyCodeInput.value = saved.testimonyCode || "";
+          videoLabelInput.value = saved.videoLabel || "WATCH VIDEOS";
+          testimonyLabelInput.value = saved.testimonyLabel || "READ TESTIMONIES";
+          if(saved.videoCode || saved.testimonyCode) restoredFromStorage = true;
+        }
+      }
+    } catch(err){ /* fall through to defaults already in the markup */ }
+  })();
+
+  var debounceTimer = null;
+  function schedulePreview(){
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(updatePreview, 150);
+  }
+
+  [videoCodeInput, testimonyCodeInput, videoLabelInput, testimonyLabelInput].forEach(function(el){
+    el.addEventListener("input", schedulePreview);
+  });
+
+  document.querySelectorAll(".width-toggle button").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll(".width-toggle button").forEach(function(b){ b.classList.remove("active"); });
+      btn.classList.add("active");
+      document.getElementById("previewOuter").classList.toggle("mobile", btn.dataset.width === "mobile");
+    });
+  });
+
+  // ---- building the embeddable fragment ----
+  // This exact function's output is what gets exported AND what feeds the
+  // live preview, so preview and export can never drift apart. The two
+  // pasted snippets are kept byte-for-byte as given — this only adds the
+  // tab toggle shell around them.
+  function escText(s){ return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  function buildFragment(videoCode, testimonyCode, videoLabel, testimonyLabel){
+    return (
+'<div class="tst-wrap" id="tstRoot">\n' +
+'  <div class="tst-tabs" role="tablist">\n' +
+'    <button type="button" class="tst-tab-btn active" id="tstTabVideoBtn" data-tab="videos" role="tab" aria-selected="true">' + escText(videoLabel) + '</button>\n' +
+'    <button type="button" class="tst-tab-btn" id="tstTabTestimonyBtn" data-tab="testimonies" role="tab" aria-selected="false">' + escText(testimonyLabel) + '</button>\n' +
+'  </div>\n' +
+'  <div class="tst-panel" id="tstPanelVideos">\n' +
+'<!-- TST:VIDEO:START -->\n' +
+videoCode + '\n' +
+'<!-- TST:VIDEO:END -->\n' +
+'  </div>\n' +
+'  <div class="tst-panel" id="tstPanelTestimonies" hidden>\n' +
+'<!-- TST:TESTIMONY:START -->\n' +
+testimonyCode + '\n' +
+'<!-- TST:TESTIMONY:END -->\n' +
+'  </div>\n' +
+'</div>\n' +
+'<style>\n' +
+'.tst-wrap { max-width: 1280px; margin: auto; padding: 0 12px; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }\n' +
+'.tst-tabs { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 30px; }\n' +
+'.tst-tab-btn { box-sizing: border-box; background: none; border: 1px solid transparent; font-family: inherit; font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #333; cursor: pointer; padding: 9px 20px; border-radius: 999px; transition: background .15s ease, color .15s ease, border-color .15s ease; }\n' +
+'.tst-tab-btn:hover { color: #000; }\n' +
+'.tst-tab-btn.active { background: #fff; color: #111; border-color: #e2e2e2; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }\n' +
+'.tst-panel[hidden] { display: none; }\n' +
+'@media (max-width: 640px) {\n' +
+'  .tst-tabs { gap: 10px; margin-bottom: 20px; }\n' +
+'  .tst-tab-btn { padding: 7px 15px; font-size: 12px; }\n' +
+'}\n' +
+'</style>\n' +
+'<script>\n' +
+'(function(){\n' +
+'  "use strict";\n' +
+'  var videoBtn = document.getElementById("tstTabVideoBtn");\n' +
+'  var testimonyBtn = document.getElementById("tstTabTestimonyBtn");\n' +
+'  var videoPanel = document.getElementById("tstPanelVideos");\n' +
+'  var testimonyPanel = document.getElementById("tstPanelTestimonies");\n' +
+'  function activate(tab){\n' +
+'    var isVideos = tab === "videos";\n' +
+'    videoBtn.classList.toggle("active", isVideos);\n' +
+'    testimonyBtn.classList.toggle("active", !isVideos);\n' +
+'    videoBtn.setAttribute("aria-selected", isVideos ? "true" : "false");\n' +
+'    testimonyBtn.setAttribute("aria-selected", isVideos ? "false" : "true");\n' +
+'    videoPanel.hidden = !isVideos;\n' +
+'    testimonyPanel.hidden = isVideos;\n' +
+'  }\n' +
+'  videoBtn.addEventListener("click", function(){ activate("videos"); });\n' +
+'  testimonyBtn.addEventListener("click", function(){ activate("testimonies"); });\n' +
+'})();\n' +
+'<\/script>'
+    );
+  }
+
+  function updatePreview(){
+    var videoCode = videoCodeInput.value.trim() || '<p style="color:#999;padding:20px 0;">Paste your Video Grid embed code on the left to preview it here.</p>';
+    var testimonyCode = testimonyCodeInput.value.trim() || '<p style="color:#999;padding:20px 0;">Paste your Testimony Image Filter embed code on the left to preview it here.</p>';
+    var fragment = buildFragment(videoCode, testimonyCode, videoLabelInput.value || "WATCH VIDEOS", testimonyLabelInput.value || "READ TESTIMONIES");
+    var doc = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+      '<style>html,body{margin:0;background:#fff;color:#222;font-family:system-ui,-apple-system,sans-serif;padding:20px 0;}</style></head><body>' + fragment + '</body></html>';
+    iframe.srcdoc = doc;
+    persistState();
+  }
+
+  // ---- export / validation ----
+  function showError(msg){ errorBanner.textContent = msg; errorBanner.classList.add("show"); }
+  function clearErrors(){
+    errorBanner.classList.remove("show");
+    document.querySelectorAll(".field-error").forEach(function(el){ el.classList.remove("field-error"); });
+  }
+
+  document.getElementById("getCodeBtn").addEventListener("click", function(){
+    clearErrors();
+    var firstBad = null;
+    if(!videoCodeInput.value.trim()){ videoCodeInput.classList.add("field-error"); firstBad = firstBad || videoCodeInput; }
+    if(!testimonyCodeInput.value.trim()){ testimonyCodeInput.classList.add("field-error"); firstBad = firstBad || testimonyCodeInput; }
+    if(firstBad){
+      showError("Paste both embed codes before generating the combined code — highlighted in red.");
+      firstBad.scrollIntoView({ behavior: "smooth", block: "center" });
+      firstBad.focus();
+      return;
+    }
+    var code = buildFragment(videoCodeInput.value.trim(), testimonyCodeInput.value.trim(), videoLabelInput.value || "WATCH VIDEOS", testimonyLabelInput.value || "READ TESTIMONIES");
+    document.getElementById("codeOutput").value = code;
+    document.getElementById("modalOverlay").classList.add("show");
+  });
+
+  document.getElementById("closeModalBtn").addEventListener("click", function(){
+    document.getElementById("modalOverlay").classList.remove("show");
+  });
+  document.getElementById("modalOverlay").addEventListener("click", function(e){
+    if(e.target.id === "modalOverlay") e.currentTarget.classList.remove("show");
+  });
+
+  // ---- import: rebuild fields from previously-exported combined code ----
+  function unescText(s){ return String(s == null ? "" : s).replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">"); }
+
+  function parseEmbedCode(code){
+    var videoMatch = code.match(/<!-- TST:VIDEO:START -->\n?([\s\S]*?)\n?<!-- TST:VIDEO:END -->/);
+    var testimonyMatch = code.match(/<!-- TST:TESTIMONY:START -->\n?([\s\S]*?)\n?<!-- TST:TESTIMONY:END -->/);
+    if(!videoMatch || !testimonyMatch){
+      throw new Error("Couldn't find both sections in that code — make sure you pasted the full combined embed code from this builder.");
+    }
+    var videoLabelMatch = code.match(/id="tstTabVideoBtn"[^>]*>([^<]*)</);
+    var testimonyLabelMatch = code.match(/id="tstTabTestimonyBtn"[^>]*>([^<]*)</);
+    return {
+      videoCode: videoMatch[1].trim(),
+      testimonyCode: testimonyMatch[1].trim(),
+      videoLabel: videoLabelMatch ? unescText(videoLabelMatch[1]) : "WATCH VIDEOS",
+      testimonyLabel: testimonyLabelMatch ? unescText(testimonyLabelMatch[1]) : "READ TESTIMONIES"
+    };
+  }
+
+  var importOverlay = document.getElementById("importModalOverlay");
+  var importInput = document.getElementById("importInput");
+  var importError = document.getElementById("importError");
+
+  document.getElementById("openImportBtn").addEventListener("click", function(){
+    importInput.value = "";
+    importError.hidden = true;
+    importOverlay.classList.add("show");
+    importInput.focus();
+  });
+  document.getElementById("closeImportModalBtn").addEventListener("click", function(){
+    importOverlay.classList.remove("show");
+  });
+  importOverlay.addEventListener("click", function(e){
+    if(e.target.id === "importModalOverlay") importOverlay.classList.remove("show");
+  });
+
+  document.getElementById("loadImportBtn").addEventListener("click", function(){
+    importError.hidden = true;
+    var code = importInput.value.trim();
+    if(!code){
+      importError.textContent = "Paste the embed code first.";
+      importError.hidden = false;
+      return;
+    }
+    try {
+      var loaded = parseEmbedCode(code);
+      videoCodeInput.value = loaded.videoCode;
+      testimonyCodeInput.value = loaded.testimonyCode;
+      videoLabelInput.value = loaded.videoLabel;
+      testimonyLabelInput.value = loaded.testimonyLabel;
+      updatePreview();
+      importOverlay.classList.remove("show");
+      showToast("Loaded combined embed code");
+    } catch(err){
+      importError.textContent = err.message || "Couldn't read that code.";
+      importError.hidden = false;
+    }
+  });
+
+  function showToast(msg){
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 1600);
+  }
+
+  document.getElementById("copyCodeBtn").addEventListener("click", function(){
+    var ta = document.getElementById("codeOutput");
+    ta.select();
+    try {
+      navigator.clipboard.writeText(ta.value).then(function(){ showToast("Code copied"); }).catch(function(){
+        document.execCommand("copy"); showToast("Code copied");
+      });
+    } catch(e){ document.execCommand("copy"); showToast("Code copied"); }
+  });
+
+  // ---- init ----
+  updatePreview();
+  if(restoredFromStorage) showToast("Restored your last edits on this device");
+})();
+</script>
+
+</body></html>
