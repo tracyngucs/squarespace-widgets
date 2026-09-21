@@ -1,0 +1,845 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Testimony Category Image Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#f6f2ea;
+    --surface:#ffffff;
+    --surface-2:#efe7d8;
+    --border:#ddd0b4;
+    --ink:#241f16;
+    --ink-soft:#5c5240;
+    --muted:#8c8065;
+    --accent:#a8752f;
+    --accent-strong:#7f5920;
+    --accent-ink:#fffaf0;
+    --danger:#b3432b;
+    --danger-bg:#fbeae5;
+    --focus:#a8752f;
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#16130d; --surface:#201a12; --surface-2:#2a2216; --border:#3c3220;
+      --ink:#f3ebd9; --ink-soft:#cdbfa0; --muted:#988b6c;
+      --accent:#d8a24e; --accent-strong:#eab766; --accent-ink:#1a1409;
+      --danger:#e2836a; --danger-bg:#3a2018;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#16130d; --surface:#201a12; --surface-2:#2a2216; --border:#3c3220;
+    --ink:#f3ebd9; --ink-soft:#cdbfa0; --muted:#988b6c;
+    --accent:#d8a24e; --accent-strong:#eab766; --accent-ink:#1a1409;
+    --danger:#e2836a; --danger-bg:#3a2018;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Inter",system-ui,-apple-system,sans-serif;
+    padding:28px 16px 60px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+  header.page-head{margin-bottom:22px;}
+  h1{
+    font-family:"Fraunces",Georgia,serif;
+    font-weight:600;
+    font-size:clamp(24px,3vw,32px);
+    letter-spacing:-0.01em;
+    text-wrap:balance;
+    margin:0 0 6px;
+  }
+  .page-head p{margin:0;color:var(--ink-soft);font-size:14.5px;max-width:64ch;}
+
+  .layout{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(300px,420px);
+    gap:22px;
+    align-items:start;
+  }
+  @media (max-width:880px){ .layout{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px;
+  }
+
+  .panel-top-actions{display:flex;justify-content:flex-end;margin-bottom:12px;}
+  .ghost-link-btn{
+    background:transparent;border:none;color:var(--accent-strong);
+    font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+    padding:2px 0;text-decoration:underline;text-underline-offset:2px;
+  }
+  .ghost-link-btn:hover{color:var(--accent);}
+
+  #errorBanner{
+    display:none;background:var(--danger-bg);border:1px solid var(--danger);
+    color:var(--danger);border-radius:var(--radius);padding:11px 14px;
+    font-size:13.5px;margin-bottom:16px;
+  }
+  #errorBanner.show{display:block;}
+
+  .field{margin-bottom:14px;}
+  .field:last-child{margin-bottom:0;}
+  .field-label{
+    display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);
+    text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;
+  }
+  .field-hint{margin:5px 0 0;font-size:12px;color:var(--muted);}
+  input[type="url"], input[type="text"]{
+    width:100%;font-family:inherit;font-size:14px;color:var(--ink);
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:8px;padding:9px 11px;
+  }
+  input:focus{ outline:2px solid var(--focus); outline-offset:1px; }
+  input.field-error{ border-color:var(--danger); }
+  input[type="file"]{ width:100%; font-size:12.5px; color:var(--ink-soft); }
+
+  .collection-field{
+    background:var(--surface-2); border:1px solid var(--border); border-radius:12px;
+    padding:16px; margin-bottom:20px;
+  }
+
+  .cat-card{
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px;
+    margin-bottom:16px;
+    background:var(--surface-2);
+  }
+  .cat-card-head{
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;
+  }
+  .cat-card-actions{display:flex;gap:6px;}
+  .cat-badge{
+    font-family:"Fraunces",serif; font-weight:600; font-size:15px; color:var(--accent-strong);
+  }
+  .icon-btn{
+    background:transparent; border:1px solid var(--border); color:var(--muted);
+    width:28px;height:28px; border-radius:8px; cursor:pointer; font-size:13px; line-height:1;
+  }
+  .icon-btn:hover{border-color:var(--danger);color:var(--danger);}
+  .icon-btn:disabled{opacity:.35;cursor:default;}
+  .icon-btn:disabled:hover{border-color:var(--border);color:var(--muted);}
+
+  #addCategoryBtn{
+    width:100%; background:transparent; border:1.5px dashed var(--border);
+    color:var(--ink-soft); border-radius:10px; padding:11px;
+    font-family:inherit; font-size:13.5px; font-weight:500; cursor:pointer;
+  }
+  #addCategoryBtn:hover{border-color:var(--accent);color:var(--accent-strong);}
+
+  .primary-btn{
+    background:var(--accent); color:var(--accent-ink); border:none;
+    border-radius:9px; padding:12px 18px; font-family:inherit; font-size:14.5px;
+    font-weight:600; cursor:pointer; width:100%; margin-top:18px;
+  }
+  .primary-btn:hover{background:var(--accent-strong);}
+
+  .preview-panel{position:sticky;top:16px;}
+  .preview-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .preview-head h2{font-family:"Fraunces",serif;font-size:16px;font-weight:600;margin:0;}
+  .width-toggle{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .width-toggle button{background:var(--surface);border:none;color:var(--ink-soft);font-size:12px;padding:5px 10px;cursor:pointer;}
+  .width-toggle button + button{border-left:1px solid var(--border);}
+  .width-toggle button.active{background:var(--accent);color:var(--accent-ink);}
+
+  .preview-frame-outer{
+    background:var(--surface-2); border:1px solid var(--border); border-radius:12px;
+    padding:14px; display:flex; justify-content:center;
+  }
+  #previewIframe{
+    width:100%; max-width:100%; height:560px; border:none; background:#fff;
+    border-radius:6px; transition:max-width .2s ease;
+  }
+  .preview-frame-outer.mobile #previewIframe{max-width:360px;height:640px;}
+
+  .modal-overlay{
+    position:fixed;inset:0; background:rgba(20,16,8,.55); display:none;
+    align-items:center; justify-content:center; padding:20px; z-index:100;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    max-width:720px; width:100%; max-height:85vh; display:flex; flex-direction:column; padding:20px;
+  }
+  .modal-box h2{font-family:"Fraunces",serif;font-size:18px;margin:0 0 4px;}
+  .modal-box p{margin:0 0 14px;color:var(--ink-soft);font-size:13.5px;}
+  #codeOutput, #importInput{
+    flex:1; min-height:260px; font-family:ui-monospace,Menlo,Consolas,monospace;
+    font-size:12px; line-height:1.5; background:var(--bg); color:var(--ink);
+    border:1px solid var(--border); border-radius:8px; padding:12px; resize:vertical;
+  }
+  .import-error{
+    margin-top:10px; background:var(--danger-bg); border:1px solid var(--danger);
+    color:var(--danger); border-radius:8px; padding:9px 12px; font-size:13px;
+  }
+  .import-error[hidden]{display:none;}
+  .modal-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+  .modal-actions button{
+    font-family:inherit; font-size:13.5px; font-weight:600; border-radius:8px;
+    padding:9px 16px; cursor:pointer; border:1px solid var(--border);
+    background:var(--surface); color:var(--ink);
+  }
+  .modal-actions .primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
+  .modal-actions .primary:hover{background:var(--accent-strong);}
+  .modal-actions .ghost:hover{border-color:var(--accent);}
+  #closeModalBtn{margin-left:auto;}
+
+  .toast{
+    position:fixed; bottom:22px;left:50%; transform:translateX(-50%) translateY(8px);
+    background:var(--ink); color:var(--bg); padding:9px 16px; border-radius:8px;
+    font-size:13px; opacity:0; pointer-events:none; transition:opacity .18s ease, transform .18s ease; z-index:200;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <h1>Testimony Category Image Builder</h1>
+    <p>Pair each testimony category with an image. Visitors click a category's image to filter the testimony list below it. Live data (title + excerpt) is pulled straight from your Squarespace collection — you're only configuring the images here.</p>
+  </header>
+
+  <div class="layout">
+    <div class="panel">
+      <div class="panel-top-actions">
+        <button type="button" class="ghost-link-btn" id="openImportBtn">Load from existing embed code&hellip;</button>
+      </div>
+      <div id="errorBanner"></div>
+
+      <div class="collection-field">
+        <div class="field">
+          <label class="field-label" for="collectionUrl">Testimony collection URL</label>
+          <input type="text" id="collectionUrl" value="/testimony-1" placeholder="/testimony-1">
+          <p class="field-hint">The Squarespace collection this pulls testimonies from. Leave as-is unless you're reusing this for a different collection.</p>
+        </div>
+      </div>
+
+      <div id="categoriesContainer"></div>
+      <button type="button" id="addCategoryBtn">+ Add another category</button>
+      <button type="button" class="primary-btn" id="getCodeBtn">Get embed code</button>
+    </div>
+
+    <div class="panel preview-panel">
+      <div class="preview-head">
+        <h2>Live preview</h2>
+        <div class="width-toggle">
+          <button type="button" data-width="desktop" class="active">Desktop</button>
+          <button type="button" data-width="mobile">Mobile</button>
+        </div>
+      </div>
+      <div class="preview-frame-outer" id="previewOuter">
+        <iframe id="previewIframe" title="Category image filter preview"></iframe>
+      </div>
+      <p class="field-hint" style="margin-top:10px;">Preview shows sample placeholder testimonies so you can check the layout. The real embed code pulls your actual testimonies live from Squarespace.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <h2>Embed code</h2>
+    <p>Paste this into a Squarespace code block wherever you want the category filter to appear.</p>
+    <textarea id="codeOutput" readonly></textarea>
+    <div class="modal-actions">
+      <button type="button" class="primary" id="copyCodeBtn">Copy code</button>
+      <button type="button" class="ghost" id="closeModalBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="importModalOverlay">
+  <div class="modal-box">
+    <h2>Load from existing embed code</h2>
+    <p>Paste the embed code you last put into Squarespace, and it'll rebuild the categories below.</p>
+    <textarea id="importInput" placeholder="Paste the full embed code here&hellip;"></textarea>
+    <div id="importError" class="import-error" hidden></div>
+    <div class="modal-actions">
+      <button type="button" class="primary" id="loadImportBtn">Load categories</button>
+      <button type="button" class="ghost" id="closeImportModalBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  function newCategory(overrides){
+    return Object.assign({ name:"", imageUrl:"", localPreviewUrl:null }, overrides || {});
+  }
+
+  var STORAGE_KEY = "testimonyImageFilterBuilder.v1";
+
+  function persistState(){
+    try {
+      var toSave = {
+        collectionUrl: document.getElementById("collectionUrl").value,
+        categories: categories.map(function(c){ return { name: c.name, imageUrl: c.imageUrl }; })
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+    } catch(err){ /* storage unavailable — not fatal */ }
+  }
+
+  function loadInitialState(){
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        var saved = JSON.parse(raw);
+        if(saved && Array.isArray(saved.categories) && saved.categories.length > 0){
+          restoredFromStorage = true;
+          return saved;
+        }
+      }
+    } catch(err){ /* fall through to defaults below */ }
+    // A sensible starting point based on this site's actual categories —
+    // edit or remove any of these freely.
+    return {
+      collectionUrl: "/testimony-1",
+      categories: [
+        { name: "Healing", imageUrl: "" },
+        { name: "Provision", imageUrl: "" },
+        { name: "Deliverance", imageUrl: "" }
+      ]
+    };
+  }
+
+  var restoredFromStorage = false;
+  var initialState = loadInitialState();
+  var categories = initialState.categories.map(function(c){ return newCategory(c); });
+
+  var container = document.getElementById("categoriesContainer");
+  var addBtn = document.getElementById("addCategoryBtn");
+  var errorBanner = document.getElementById("errorBanner");
+  var iframe = document.getElementById("previewIframe");
+  var collectionUrlInput = document.getElementById("collectionUrl");
+  collectionUrlInput.value = initialState.collectionUrl || "/testimony-1";
+
+  function cardTemplate(i){
+    return (
+      '<div class="cat-card" id="card-' + i + '" data-idx="' + i + '">' +
+        '<div class="cat-card-head">' +
+          '<span class="cat-badge">Category ' + (i+1) + '</span>' +
+          '<div class="cat-card-actions">' +
+            '<button type="button" class="icon-btn" data-action="moveUp" data-idx="' + i + '" aria-label="Move category ' + (i+1) + ' up" title="Move up"' + (i === 0 ? ' disabled' : '') + '>\u2191</button>' +
+            '<button type="button" class="icon-btn" data-action="moveDown" data-idx="' + i + '" aria-label="Move category ' + (i+1) + ' down" title="Move down"' + (i === categories.length - 1 ? ' disabled' : '') + '>\u2193</button>' +
+            '<button type="button" class="icon-btn" data-action="remove" data-idx="' + i + '" aria-label="Remove category ' + (i+1) + '"' + (categories.length <= 1 ? ' disabled' : '') + '>\u2715</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="field">' +
+          '<label class="field-label" for="name-' + i + '">Category name</label>' +
+          '<input type="text" id="name-' + i + '" data-role="name" data-idx="' + i + '" placeholder="Healing">' +
+          '<p class="field-hint">Must match the category name exactly as it appears on your Squarespace testimony posts.</p>' +
+        '</div>' +
+        '<div class="field">' +
+          '<label class="field-label" for="imageurl-' + i + '">Hosted image URL</label>' +
+          '<input type="url" id="imageurl-' + i + '" data-role="imageUrl" data-idx="' + i + '" placeholder="https://www.yoursite.com/s/your-image.jpg">' +
+          '<p class="field-hint">Upload the image to your site first, then paste its link here — this is what goes live.</p>' +
+        '</div>' +
+        '<div class="field">' +
+          '<label class="field-label" for="localfile-' + i + '">Preview with a local file (optional)</label>' +
+          '<input type="file" id="localfile-' + i + '" data-role="localPreview" data-idx="' + i + '" accept="image/*">' +
+          '<p class="field-hint">Only shown in the preview on this page — it is not included in the final code.</p>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function applyCategoryToCard(i){
+    var c = categories[i];
+    var nameInput = document.getElementById("name-" + i);
+    if(document.activeElement !== nameInput) nameInput.value = c.name;
+    var urlInput = document.getElementById("imageurl-" + i);
+    if(document.activeElement !== urlInput) urlInput.value = c.imageUrl;
+  }
+
+  function renderAllCards(){
+    container.innerHTML = categories.map(function(_, i){ return cardTemplate(i); }).join("");
+    categories.forEach(function(_, i){ applyCategoryToCard(i); });
+  }
+
+  var debounceTimer = null;
+  function schedulePreview(){
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(updatePreview, 150);
+  }
+
+  container.addEventListener("input", function(e){
+    var role = e.target.dataset.role, idx = e.target.dataset.idx !== undefined ? +e.target.dataset.idx : null;
+    if(idx === null) return;
+    if(role === "name"){ categories[idx].name = e.target.value; schedulePreview(); }
+    else if(role === "imageUrl"){ categories[idx].imageUrl = e.target.value; schedulePreview(); }
+  });
+
+  collectionUrlInput.addEventListener("input", schedulePreview);
+
+  container.addEventListener("change", function(e){
+    var role = e.target.dataset.role, idx = e.target.dataset.idx !== undefined ? +e.target.dataset.idx : null;
+    if(role === "localPreview"){
+      var file = e.target.files[0];
+      categories[idx].localPreviewUrl = file ? URL.createObjectURL(file) : null;
+      updatePreview();
+    }
+  });
+
+  container.addEventListener("click", function(e){
+    var btn = e.target.closest("[data-action]");
+    if(!btn || btn.disabled) return;
+    var action = btn.dataset.action, idx = +btn.dataset.idx;
+    if(action === "remove"){
+      if(categories.length <= 1) return;
+      categories.splice(idx, 1);
+      renderAllCards();
+      updatePreview();
+    } else if(action === "moveUp"){
+      if(idx > 0){
+        var tmpUp = categories[idx - 1]; categories[idx - 1] = categories[idx]; categories[idx] = tmpUp;
+        renderAllCards(); updatePreview();
+      }
+    } else if(action === "moveDown"){
+      if(idx < categories.length - 1){
+        var tmpDown = categories[idx + 1]; categories[idx + 1] = categories[idx]; categories[idx] = tmpDown;
+        renderAllCards(); updatePreview();
+      }
+    }
+  });
+
+  addBtn.addEventListener("click", function(){
+    categories.push(newCategory());
+    renderAllCards();
+    updatePreview();
+  });
+
+  document.querySelectorAll(".width-toggle button").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll(".width-toggle button").forEach(function(b){ b.classList.remove("active"); });
+      btn.classList.add("active");
+      document.getElementById("previewOuter").classList.toggle("mobile", btn.dataset.width === "mobile");
+    });
+  });
+
+  // ---- building the embeddable fragment ----
+  // This exact function's output is what gets exported AND what feeds the
+  // live preview (with sample data swapped in for `preloadedItems`), so
+  // preview and export can never drift apart.
+  function esc(str){ return String(str || "").replace(/"/g, "&quot;"); }
+  function escJs(str){ return String(str || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/<\/script>/gi, "<\\/script>"); }
+
+  function buildFragment(runtimeCategories, collectionUrl, preloadedItems){
+    var categoriesJson = JSON.stringify(runtimeCategories.map(function(c){ return { name: c.name, image: c.src }; }));
+    var preloadedJson = preloadedItems ? JSON.stringify(preloadedItems) : "null";
+
+    var tilesHtml = runtimeCategories.map(function(c, i){
+      return '<button type="button" class="tfi-tile" data-cat="' + esc(c.name) + '">' +
+        '<div class="tfi-tile-img"><img src="' + esc(c.src) + '" alt="' + esc(c.name) + '"></div>' +
+        '<div class="tfi-tile-label">' + esc(c.name) + '</div>' +
+      '</button>';
+    }).join("\n    ");
+
+    return (
+'<div class="tfi-wrap" id="tfiRoot">\n' +
+'  <div class="tfi-alltile-row">\n' +
+'    <button type="button" class="tfi-alltile active" id="tfiAllBtn" data-cat="All">All Testimonies</button>\n' +
+'  </div>\n' +
+'  <div class="tfi-carousel" id="tfiCarousel">\n' +
+'    <button type="button" class="tfi-arrow tfi-arrow-left" id="tfiArrowLeft" aria-label="Scroll categories left" disabled>‹</button>\n' +
+'    <div class="tfi-tiles-viewport" id="tfiTilesViewport">\n' +
+'      <div class="tfi-tiles" id="tfiTiles">\n' +
+'        ' + tilesHtml + '\n' +
+'      </div>\n' +
+'    </div>\n' +
+'    <button type="button" class="tfi-arrow tfi-arrow-right" id="tfiArrowRight" aria-label="Scroll categories right">›</button>\n' +
+'    <div class="tfi-fade" id="tfiFadeRight"></div>\n' +
+'  </div>\n' +
+'  <div class="tfi-grid" id="tfiGrid"></div>\n' +
+'  <div class="tfi-pagination" id="tfiPagination"></div>\n' +
+'</div>\n' +
+'<style>\n' +
+'.tfi-wrap { max-width: 1280px; margin: auto; padding: 0 12px; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }\n' +
+'.tfi-alltile-row { margin-bottom: 16px; }\n' +
+'.tfi-alltile { border: 1px solid #ccc; background: #fff; color: #333; border-radius: 999px; padding: 8px 18px; font-size: 14px; font-family: inherit; cursor: pointer; }\n' +
+'.tfi-alltile.active { background: #111; color: #fff; border-color: #111; }\n' +
+'.tfi-carousel { position: relative; margin-bottom: 28px; }\n' +
+'.tfi-tiles-viewport { overflow-x: auto; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; scrollbar-width: none; -ms-overflow-style: none; }\n' +
+'.tfi-tiles-viewport::-webkit-scrollbar { display: none; }\n' +
+'.tfi-tiles { display: flex; gap: 16px; padding: 4px 6px; }\n' +
+'.tfi-tile { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; width: 190px; background: none; border: none; cursor: pointer; padding: 0; font-family: inherit; }\n' +
+'.tfi-tile-img { width: 100%; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; border: 3px solid transparent; transition: border-color .15s ease, transform .15s ease; background: #eee; }\n' +
+'.tfi-tile-img img { width: 100%; height: 100%; object-fit: cover; display: block; }\n' +
+'.tfi-tile:hover .tfi-tile-img { transform: scale(1.03); }\n' +
+'.tfi-tile.active .tfi-tile-img { border-color: #111; }\n' +
+'.tfi-tile-label { margin-top: 8px; font-size: 13.5px; font-weight: 600; color: #333; text-align: center; line-height: 1.3; }\n' +
+'.tfi-tile.active .tfi-tile-label { color: #111; }\n' +
+'.tfi-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; border-radius: 50%; border: 1px solid #ddd; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-size: 19px; line-height: 1; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; transition: opacity .15s ease, box-shadow .15s ease; padding: 0; }\n' +
+'.tfi-arrow:hover { box-shadow: 0 3px 14px rgba(0,0,0,0.22); }\n' +
+'.tfi-arrow:disabled { opacity: 0; pointer-events: none; }\n' +
+'.tfi-arrow-left { left: 4px; }\n' +
+'.tfi-arrow-right { right: 4px; }\n' +
+'.tfi-fade { position: absolute; top: 0; bottom: 0; right: 0; width: 56px; pointer-events: none; background: linear-gradient(to right, rgba(255,255,255,0), #fff); transition: opacity .15s ease; border-radius: 0 10px 10px 0; }\n' +
+'.tfi-fade.hide { opacity: 0; }\n' +
+'.tfi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: start; min-height: 60px; }\n' +
+'.tfi-card { display: block; text-decoration: none; color: inherit; cursor: pointer; border: 1px solid #e5e5e5; border-radius: 10px; padding: 20px; background: #fff; transition: border-color .15s ease, box-shadow .15s ease; }\n' +
+'.tfi-card:hover { border-color: #bbb; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }\n' +
+'.tfi-title { font-size: 16px; font-weight: 700; line-height: 1.35; color: #111; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: calc(1.35em * 2); }\n' +
+'.tfi-excerpt { margin-top: 8px; font-size: 13.5px; line-height: 1.5; color: #5a5a5a; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }\n' +
+'.tfi-pagination { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px; margin-top: 32px; font-size: 14px; }\n' +
+'.tfi-pagination button { border: none; background: none; cursor: pointer; font-family: inherit; font-size: 14px; color: #333; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 4px; }\n' +
+'.tfi-pagination button.active { background: #e7e5e0; font-weight: 700; }\n' +
+'.tfi-pagination button:disabled { opacity: 0.35; cursor: default; }\n' +
+'.tfi-pagination .tfi-ellipsis { width: auto; min-width: 0; padding: 0 2px; color: #999; cursor: default; }\n' +
+'.tfi-loading, .tfi-empty { text-align: center; color: #888; padding: 40px 0; font-size: 14px; grid-column: 1 / -1; }\n' +
+'@media (max-width: 900px) {\n' +
+'  .tfi-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }\n' +
+'}\n' +
+'@media (max-width: 640px) {\n' +
+'  .tfi-carousel { margin-bottom: 20px; }\n' +
+'  .tfi-tiles { gap: 12px; padding: 4px 4px; }\n' +
+'  .tfi-tile { width: 132px; }\n' +
+'  .tfi-tile-label { font-size: 11.5px; margin-top: 6px; }\n' +
+'  .tfi-arrow { width: 32px; height: 32px; font-size: 16px; }\n' +
+'  .tfi-fade { width: 40px; }\n' +
+'  .tfi-alltile { padding: 6px 14px; font-size: 13px; }\n' +
+'  .tfi-grid { grid-template-columns: 1fr; gap: 14px; }\n' +
+'  .tfi-card { padding: 16px; }\n' +
+'  .tfi-title { font-size: 15px; min-height: 0; -webkit-line-clamp: 3; }\n' +
+'  .tfi-excerpt { font-size: 13px; -webkit-line-clamp: 3; }\n' +
+'  .tfi-pagination { margin-top: 20px; gap: 2px; }\n' +
+'  .tfi-pagination button { font-size: 13px; min-width: 26px; height: 26px; padding: 0 4px; }\n' +
+'}\n' +
+'</style>\n' +
+'<script>\n' +
+'(function(){\n' +
+'  "use strict";\n' +
+'  var COLLECTION_URL = "' + escJs(collectionUrl) + '";\n' +
+'  var MOBILE_QUERY = "(max-width: 640px)";\n' +
+'  var EXCERPT_LENGTH = 140;\n' +
+'  var PRELOADED_ITEMS = ' + preloadedJson + ';\n' +
+'  function getPerPage(){ return (window.matchMedia && window.matchMedia(MOBILE_QUERY).matches) ? 3 : 6; }\n' +
+'  var PER_PAGE = getPerPage();\n' +
+'  var allItems = [];\n' +
+'  var activeCategory = "All";\n' +
+'  var page = 1;\n' +
+'  var loadFailed = false;\n' +
+'  var tilesEl = document.getElementById("tfiTiles");\n' +
+'  var tilesViewport = document.getElementById("tfiTilesViewport");\n' +
+'  var arrowLeft = document.getElementById("tfiArrowLeft");\n' +
+'  var arrowRight = document.getElementById("tfiArrowRight");\n' +
+'  var fadeRight = document.getElementById("tfiFadeRight");\n' +
+'  var allBtn = document.getElementById("tfiAllBtn");\n' +
+'  var gridEl = document.getElementById("tfiGrid");\n' +
+'  var paginationEl = document.getElementById("tfiPagination");\n' +
+'  function escAttr(s){ return String(s == null ? "" : s).replace(/"/g, "&quot;"); }\n' +
+'  function escText(s){ return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }\n' +
+'  function stripHtml(html){\n' +
+'    var div = document.createElement("div");\n' +
+'    div.innerHTML = html || "";\n' +
+'    var text = div.textContent || div.innerText || "";\n' +
+'    return text.replace(/\\s+/g, " ").trim();\n' +
+'  }\n' +
+'  function truncate(text, len){\n' +
+'    if(!text) return "";\n' +
+'    if(text.length <= len) return text;\n' +
+'    var cut = text.slice(0, len);\n' +
+'    var lastSpace = cut.lastIndexOf(" ");\n' +
+'    if(lastSpace > 40) cut = cut.slice(0, lastSpace);\n' +
+'    return cut + "\\u2026";\n' +
+'  }\n' +
+'  // Squarespace\\u2019s JSON endpoint only returns ~20 items per call, so we walk\n' +
+'  // its own pagination (offset-based) once at load to gather every item.\n' +
+'  function fetchAllItems(onDone){\n' +
+'    var items = [];\n' +
+'    function fetchPage(url){\n' +
+'      fetch(url, { credentials: "same-origin" })\n' +
+'        .then(function(r){ return r.json(); })\n' +
+'        .then(function(data){\n' +
+'          items = items.concat(data.items || []);\n' +
+'          if(data.pagination && data.pagination.nextPage && data.pagination.nextPageUrl){\n' +
+'            var nextUrl = data.pagination.nextPageUrl;\n' +
+'            nextUrl += (nextUrl.indexOf("?") === -1 ? "?" : "&") + "format=json";\n' +
+'            fetchPage(nextUrl);\n' +
+'          } else {\n' +
+'            onDone(items, null);\n' +
+'          }\n' +
+'        })\n' +
+'        .catch(function(err){ onDone(items, err); });\n' +
+'    }\n' +
+'    fetchPage(COLLECTION_URL + (COLLECTION_URL.indexOf("?") === -1 ? "?" : "&") + "format=json");\n' +
+'  }\n' +
+'  function loadItems(onDone){\n' +
+'    if(PRELOADED_ITEMS){ onDone(PRELOADED_ITEMS, null); return; }\n' +
+'    fetchAllItems(onDone);\n' +
+'  }\n' +
+'  function getFilteredItems(){\n' +
+'    if(activeCategory === "All") return allItems;\n' +
+'    return allItems.filter(function(it){ return (it.categories || []).indexOf(activeCategory) !== -1; });\n' +
+'  }\n' +
+'  function getPageWindow(current, total){\n' +
+'    var pages = [];\n' +
+'    var windowSize = 1;\n' +
+'    var addedEllipsisBefore = false;\n' +
+'    for(var p = 1; p <= total; p++){\n' +
+'      var isEdge = (p === 1 || p === total);\n' +
+'      var isNearCurrent = Math.abs(p - current) <= windowSize;\n' +
+'      if(isEdge || isNearCurrent){ pages.push(p); addedEllipsisBefore = false; }\n' +
+'      else if(!addedEllipsisBefore){ pages.push("\\u2026"); addedEllipsisBefore = true; }\n' +
+'    }\n' +
+'    return pages;\n' +
+'  }\n' +
+'  function renderTilesActiveState(){\n' +
+'    allBtn.classList.toggle("active", activeCategory === "All");\n' +
+'    tilesEl.querySelectorAll(".tfi-tile").forEach(function(t){\n' +
+'      t.classList.toggle("active", t.dataset.cat === activeCategory);\n' +
+'    });\n' +
+'  }\n' +
+'  function renderGrid(){\n' +
+'    var filtered = getFilteredItems();\n' +
+'    var totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));\n' +
+'    if(page > totalPages) page = totalPages;\n' +
+'    var start = (page - 1) * PER_PAGE;\n' +
+'    var pageItems = filtered.slice(start, start + PER_PAGE);\n' +
+'    if(filtered.length === 0){\n' +
+'      gridEl.innerHTML = \'<div class="tfi-empty">\' + (loadFailed ? "Couldn\\u2019t load testimonies right now \\u2014 please refresh the page." : "No testimonies found in this category.") + "</div>";\n' +
+'      paginationEl.innerHTML = "";\n' +
+'      return;\n' +
+'    }\n' +
+'    gridEl.innerHTML = pageItems.map(function(it){\n' +
+'      var excerptSource = (it.excerpt && it.excerpt.trim()) ? it.excerpt : stripHtml(it.body);\n' +
+'      var excerpt = truncate(excerptSource, EXCERPT_LENGTH);\n' +
+'      return (\n' +
+'        \'<a class="tfi-card" href="\' + escAttr(it.fullUrl) + \'">\' +\n' +
+'          \'<div class="tfi-title">\' + escText(it.title || "") + "</div>" +\n' +
+'          (excerpt ? \'<div class="tfi-excerpt">\' + escText(excerpt) + "</div>" : "") +\n' +
+'        "</a>"\n' +
+'      );\n' +
+'    }).join("");\n' +
+'    renderPagination(totalPages);\n' +
+'  }\n' +
+'  function renderPagination(totalPages){\n' +
+'    if(totalPages <= 1){ paginationEl.innerHTML = ""; return; }\n' +
+'    var html = \'<button type="button" data-page="\' + (page - 1) + \'"\' + (page === 1 ? " disabled" : "") + ">\\u2039</button>";\n' +
+'    getPageWindow(page, totalPages).forEach(function(p){\n' +
+'      if(p === "\\u2026"){ html += \'<button type="button" class="tfi-ellipsis" disabled>\\u2026</button>\'; }\n' +
+'      else { html += \'<button type="button" data-page="\' + p + \'"\' + (p === page ? \' class="active"\' : "") + ">" + p + "</button>"; }\n' +
+'    });\n' +
+'    html += \'<button type="button" data-page="\' + (page + 1) + \'"\' + (page === totalPages ? " disabled" : "") + ">\\u203a</button>";\n' +
+'    paginationEl.innerHTML = html;\n' +
+'  }\n' +
+'  allBtn.addEventListener("click", function(){\n' +
+'    activeCategory = "All"; page = 1; renderTilesActiveState(); renderGrid();\n' +
+'  });\n' +
+'  tilesEl.addEventListener("click", function(e){\n' +
+'    var btn = e.target.closest(".tfi-tile");\n' +
+'    if(!btn) return;\n' +
+'    activeCategory = btn.dataset.cat; page = 1; renderTilesActiveState(); renderGrid();\n' +
+'  });\n' +
+'  function updateCarouselArrows(){\n' +
+'    if(!tilesViewport) return;\n' +
+'    var maxScroll = tilesViewport.scrollWidth - tilesViewport.clientWidth;\n' +
+'    var scrollable = maxScroll > 4;\n' +
+'    var atStart = tilesViewport.scrollLeft <= 2;\n' +
+'    var atEnd = tilesViewport.scrollLeft >= maxScroll - 2;\n' +
+'    if(arrowLeft) arrowLeft.disabled = !scrollable || atStart;\n' +
+'    if(arrowRight) arrowRight.disabled = !scrollable || atEnd;\n' +
+'    if(fadeRight) fadeRight.classList.toggle("hide", !scrollable || atEnd);\n' +
+'  }\n' +
+'  function scrollTiles(dir){\n' +
+'    if(!tilesViewport) return;\n' +
+'    var tile = tilesEl.querySelector(".tfi-tile");\n' +
+'    var step = tile ? (tile.getBoundingClientRect().width + 16) * 2 : 300;\n' +
+'    tilesViewport.scrollBy({ left: dir * step, behavior: "smooth" });\n' +
+'  }\n' +
+'  if(arrowLeft) arrowLeft.addEventListener("click", function(){ scrollTiles(-1); });\n' +
+'  if(arrowRight) arrowRight.addEventListener("click", function(){ scrollTiles(1); });\n' +
+'  if(tilesViewport){\n' +
+'    tilesViewport.addEventListener("scroll", updateCarouselArrows);\n' +
+'    window.addEventListener("resize", updateCarouselArrows);\n' +
+'  }\n' +
+'  paginationEl.addEventListener("click", function(e){\n' +
+'    var btn = e.target.closest("[data-page]");\n' +
+'    if(!btn || btn.disabled) return;\n' +
+'    page = +btn.dataset.page; renderGrid();\n' +
+'  });\n' +
+'  var resizeTimer = null;\n' +
+'  window.addEventListener("resize", function(){\n' +
+'    clearTimeout(resizeTimer);\n' +
+'    resizeTimer = setTimeout(function(){\n' +
+'      var newPerPage = getPerPage();\n' +
+'      if(newPerPage !== PER_PAGE){ PER_PAGE = newPerPage; page = 1; renderGrid(); }\n' +
+'    }, 150);\n' +
+'  });\n' +
+'  updateCarouselArrows();\n' +
+'  gridEl.innerHTML = \'<div class="tfi-loading">Loading testimonies\\u2026</div>\';\n' +
+'  loadItems(function(items, err){\n' +
+'    allItems = items;\n' +
+'    loadFailed = !!err && items.length === 0;\n' +
+'    if(err) { try { console.error("Testimony image filter: some pages failed to load", err); } catch(e){} }\n' +
+'    renderGrid();\n' +
+'  });\n' +
+'})();\n' +
+'<\/script>'
+    );
+  }
+
+  function toRuntimeCategory(c, forPreview){
+    var src = (forPreview && c.localPreviewUrl) ? c.localPreviewUrl : (c.imageUrl || "");
+    return { name: c.name || "", src: src };
+  }
+
+  // Sample placeholder testimonies so the preview demonstrates the
+  // click-to-filter behavior without needing a live, same-origin fetch
+  // (which this builder page itself cannot do).
+  function buildSampleItems(runtimeCategories){
+    var items = [];
+    var namedCats = runtimeCategories.filter(function(c){ return c.name; });
+    if(namedCats.length === 0){
+      for(var n = 1; n <= 4; n++){
+        items.push({ title: "Sample testimony " + n, body: "<p>This is placeholder text so you can preview the card layout. Add a category above to see filtering in action.</p>", categories: [], fullUrl: "#", excerpt: "" });
+      }
+      return items;
+    }
+    namedCats.forEach(function(c){
+      for(var n = 1; n <= 4; n++){
+        items.push({
+          title: c.name + " testimony " + n,
+          body: "<p>Sample excerpt text for a " + c.name + " testimony. This placeholder shows how the title and excerpt will look once real testimonies load.</p>",
+          categories: [c.name],
+          fullUrl: "#",
+          excerpt: ""
+        });
+      }
+    });
+    return items;
+  }
+
+  function updatePreview(){
+    var runtimeCategories = categories.map(function(c){ return toRuntimeCategory(c, true); }).filter(function(c){ return c.name; });
+    var sampleItems = buildSampleItems(runtimeCategories);
+    var fragment = buildFragment(runtimeCategories, collectionUrlInput.value, sampleItems);
+    var doc = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+      '<style>html,body{margin:0;background:#fff;color:#222;font-family:system-ui,-apple-system,sans-serif;padding:20px 0;}</style></head><body>' + fragment + '</body></html>';
+    iframe.srcdoc = doc;
+    persistState();
+  }
+
+  // ---- export / validation ----
+  function showError(msg){ errorBanner.textContent = msg; errorBanner.classList.add("show"); }
+  function clearErrors(){
+    errorBanner.classList.remove("show");
+    document.querySelectorAll(".field-error").forEach(function(el){ el.classList.remove("field-error"); });
+  }
+
+  document.getElementById("getCodeBtn").addEventListener("click", function(){
+    clearErrors();
+    var firstBad = null;
+    categories.forEach(function(c, i){
+      var nameInput = document.getElementById("name-" + i);
+      var urlInput = document.getElementById("imageurl-" + i);
+      if(!c.name.trim()){ nameInput.classList.add("field-error"); if(!firstBad) firstBad = nameInput; }
+      if(!c.imageUrl.trim()){ urlInput.classList.add("field-error"); if(!firstBad) firstBad = urlInput; }
+    });
+    if(firstBad){
+      showError("Fill in the missing name(s) or image link(s) below before generating the code — highlighted in red.");
+      firstBad.scrollIntoView({ behavior: "smooth", block: "center" });
+      firstBad.focus();
+      return;
+    }
+    var runtimeCategories = categories.map(function(c){ return toRuntimeCategory(c, false); });
+    var code = buildFragment(runtimeCategories, collectionUrlInput.value, null);
+    document.getElementById("codeOutput").value = code;
+    document.getElementById("modalOverlay").classList.add("show");
+  });
+
+  document.getElementById("closeModalBtn").addEventListener("click", function(){
+    document.getElementById("modalOverlay").classList.remove("show");
+  });
+  document.getElementById("modalOverlay").addEventListener("click", function(e){
+    if(e.target.id === "modalOverlay") e.currentTarget.classList.remove("show");
+  });
+
+  // ---- import: rebuild categories from previously-exported embed code ----
+  function parseEmbedCode(code){
+    var collectionMatch = code.match(/var\s+COLLECTION_URL\s*=\s*"([^"]*)"/);
+    var tilesMatch = [];
+    var tileRe = /<button type="button" class="tfi-tile" data-cat="([^"]*)">[\s\S]*?<img src="([^"]*)"/g;
+    var m;
+    while((m = tileRe.exec(code)) !== null){
+      tilesMatch.push({ name: m[1].replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">"), imageUrl: m[2] });
+    }
+    if(tilesMatch.length === 0){
+      throw new Error("Couldn't find any categories in that code — make sure you pasted the full embed code.");
+    }
+    return {
+      collectionUrl: collectionMatch ? collectionMatch[1] : "/testimony-1",
+      categories: tilesMatch.map(function(t){ return newCategory(t); })
+    };
+  }
+
+  var importOverlay = document.getElementById("importModalOverlay");
+  var importInput = document.getElementById("importInput");
+  var importError = document.getElementById("importError");
+
+  document.getElementById("openImportBtn").addEventListener("click", function(){
+    importInput.value = "";
+    importError.hidden = true;
+    importOverlay.classList.add("show");
+    importInput.focus();
+  });
+  document.getElementById("closeImportModalBtn").addEventListener("click", function(){
+    importOverlay.classList.remove("show");
+  });
+  importOverlay.addEventListener("click", function(e){
+    if(e.target.id === "importModalOverlay") importOverlay.classList.remove("show");
+  });
+
+  document.getElementById("loadImportBtn").addEventListener("click", function(){
+    importError.hidden = true;
+    var code = importInput.value.trim();
+    if(!code){
+      importError.textContent = "Paste the embed code first.";
+      importError.hidden = false;
+      return;
+    }
+    try {
+      var loaded = parseEmbedCode(code);
+      categories = loaded.categories;
+      collectionUrlInput.value = loaded.collectionUrl;
+      renderAllCards();
+      updatePreview();
+      importOverlay.classList.remove("show");
+      showToast("Loaded " + categories.length + " categor" + (categories.length === 1 ? "y" : "ies"));
+    } catch(err){
+      importError.textContent = err.message || "Couldn't read that code.";
+      importError.hidden = false;
+    }
+  });
+
+  function showToast(msg){
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 1600);
+  }
+
+  document.getElementById("copyCodeBtn").addEventListener("click", function(){
+    var ta = document.getElementById("codeOutput");
+    ta.select();
+    try {
+      navigator.clipboard.writeText(ta.value).then(function(){ showToast("Code copied"); }).catch(function(){
+        document.execCommand("copy"); showToast("Code copied");
+      });
+    } catch(e){ document.execCommand("copy"); showToast("Code copied"); }
+  });
+
+  // ---- init ----
+  renderAllCards();
+  updatePreview();
+  if(restoredFromStorage) showToast("Restored your last edits on this device");
+})();
+</script>
+
+</body></html>
